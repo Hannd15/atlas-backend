@@ -6,13 +6,13 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/permissions": {
+        "/api/permissions": {
             "get": {
                 "tags": [
                     "Permissions"
                 ],
                 "summary": "Get all permissions",
-                "operationId": "6bb707da42346cbe4cbe9660f90236d5",
+                "operationId": "27bb1606a7b293d1d49f57bb94ae71f7",
                 "responses": {
                     "200": {
                         "description": "List of permissions"
@@ -20,13 +20,13 @@
                 }
             }
         },
-        "/roles/{id}": {
+        "/api/roles/{id}": {
             "put": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Update a role",
-                "operationId": "e8c67c50f2f7ea7a8a12c812fc3ef2a4",
+                "operationId": "786d6990093a8eb3a56931f19a827e43",
                 "parameters": [
                     {
                         "name": "id",
@@ -69,7 +69,7 @@
                     "Roles"
                 ],
                 "summary": "Delete a role",
-                "operationId": "f5117dc2943b621bdb53820fcc72b457",
+                "operationId": "8285c46981c60ad600aa4077307aec04",
                 "parameters": [
                     {
                         "name": "id",
@@ -90,13 +90,13 @@
                 }
             }
         },
-        "/roles": {
+        "/api/roles": {
             "get": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Get all roles",
-                "operationId": "6e28bdec08d7292bde33180ca5928718",
+                "operationId": "77e3636d8592997ce9d6d27b50857a69",
                 "responses": {
                     "200": {
                         "description": "List of roles"
@@ -108,7 +108,7 @@
                     "Roles"
                 ],
                 "summary": "Create a new role",
-                "operationId": "c663f4d2a5e6ff52821a49cc1f385410",
+                "operationId": "97b14ba5623e93b88311859dc964e8ff",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -134,13 +134,13 @@
                 }
             }
         },
-        "/roles/{id}/permissions": {
+        "/api/roles/{id}/permissions": {
             "get": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Get permissions for a role",
-                "operationId": "f54490e19969fc841518df065850c57a",
+                "operationId": "84bccc6a2fd1c2fed89a35ac00cc7593",
                 "parameters": [
                     {
                         "name": "id",
@@ -161,13 +161,13 @@
                 }
             }
         },
-        "/roles/{roleId}/permissions/{permissionId}": {
-            "get": {
+        "/api/roles/{roleId}/permissions/{permissionId}": {
+            "post": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Assign a permission to a role",
-                "operationId": "edc1928ca316d74973704503ce8dde69",
+                "operationId": "9850870e0126287277beeec301f924ac",
                 "parameters": [
                     {
                         "name": "roleId",
@@ -194,15 +194,48 @@
                         "description": "Role or permission not found"
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Revoke a permission from a role",
+                "operationId": "fde424978373634a9184631f495edf81",
+                "parameters": [
+                    {
+                        "name": "roleId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "permissionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission revoked"
+                    },
+                    "404": {
+                        "description": "Role or permission not found"
+                    }
+                }
             }
         },
-        "/users": {
+        "/api/users": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get all users",
-                "operationId": "7e2f5799553ec93c9c43e2a58490d447",
+                "operationId": "c457726701591d1183b53aa71fc13441",
                 "responses": {
                     "200": {
                         "description": "List of users"
@@ -214,7 +247,7 @@
                     "Users"
                 ],
                 "summary": "Create a new user",
-                "operationId": "a1fce870c566eb5fc0cf3178ec5d2fed",
+                "operationId": "592819a0265360b2014512d6dbfaf0e7",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -248,13 +281,13 @@
                 }
             }
         },
-        "/users/{id}": {
+        "/api/users/{id}": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get a user by ID",
-                "operationId": "910a0c7cf580e1c605648d82a4e57f46",
+                "operationId": "36a33ff774d5cba33c039dec2c3e0287",
                 "parameters": [
                     {
                         "name": "id",
@@ -279,7 +312,7 @@
                     "Users"
                 ],
                 "summary": "Update a user",
-                "operationId": "ddfe232db1870b82493bf8bd25596d37",
+                "operationId": "b9091397c8b25f12c6adb74be6ce3a5a",
                 "parameters": [
                     {
                         "name": "id",
@@ -325,7 +358,7 @@
                     "Users"
                 ],
                 "summary": "Delete a user",
-                "operationId": "43dd20becb1f47444e484cbb18ce345c",
+                "operationId": "fa56cffde745d3f152f95cbacd936c0b",
                 "parameters": [
                     {
                         "name": "id",
@@ -346,13 +379,13 @@
                 }
             }
         },
-        "/users/{id}/roles": {
+        "/api/users/{id}/roles": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get roles for a user",
-                "operationId": "32cf2efb9afa37543893a8e228a84488",
+                "operationId": "9f544b3e35a4360b60ac7c4b63b17710",
                 "parameters": [
                     {
                         "name": "id",
@@ -373,13 +406,13 @@
                 }
             }
         },
-        "/users/{id}/permissions": {
+        "/api/users/{id}/permissions": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get permissions for a user",
-                "operationId": "89c5540a48ec7b7fc559b887089767a6",
+                "operationId": "4adf50b9cbad3c95ffaac9d22c8c3f72",
                 "parameters": [
                     {
                         "name": "id",
@@ -396,6 +429,74 @@
                     },
                     "404": {
                         "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/api/users/{userId}/permissions/{permissionId}": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Assign a permission to a user",
+                "operationId": "c8f2235551856021c1952049e79f3560",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "permissionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission assigned"
+                    },
+                    "404": {
+                        "description": "User or permission not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Revoke a permission from a user",
+                "operationId": "5922712ca40f754b7182741f593bf6aa",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "permissionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission revoked"
+                    },
+                    "404": {
+                        "description": "User or permission not found"
                     }
                 }
             }

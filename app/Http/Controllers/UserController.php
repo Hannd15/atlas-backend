@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -10,7 +12,7 @@ class UserController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/users",
+     *     path="/api/users",
      *     summary="Create a new user",
      *     tags={"Users"},
      *     @OA\RequestBody(
@@ -27,21 +29,24 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
-
-        $validated['password'] = bcrypt($validated['password']);
-        $user = User::create($validated);
-
-        return response()->json(['user' => $user], 201);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+            ]);
+            $validated['password'] = bcrypt($validated['password']);
+            $user = User::create($validated);
+            return response()->json(['user' => $user], 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al crear el usuario.'], 500);
+        }
     }
 
     /**
      * @OA\Get(
-     *     path="/users/{id}",
+     *     path="/api/users/{id}",
      *     summary="Get a user by ID",
      *     tags={"Users"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -51,16 +56,21 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            return response()->json(['user' => $user], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al obtener el usuario.'], 500);
         }
-        return response()->json(['user' => $user], 200);
     }
 
     /**
      * @OA\Put(
-     *     path="/users/{id}",
+     *     path="/api/users/{id}",
      *     summary="Update a user",
      *     tags={"Users"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -78,29 +88,30 @@ class UserController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $validated = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
+                'password' => 'sometimes|required|string|min:8',
+            ]);
+            if (isset($validated['password'])) {
+                $validated['password'] = bcrypt($validated['password']);
+            }
+            $user->update($validated);
+            return response()->json(['user' => $user], 200);
+        } catch (\Exception $e) {
+            Log::error('Error updating user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al actualizar el usuario.'], 500);
         }
-
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
-            'password' => 'sometimes|required|string|min:8',
-        ]);
-
-        if (isset($validated['password'])) {
-            $validated['password'] = bcrypt($validated['password']);
-        }
-
-        $user->update($validated);
-
-        return response()->json(['user' => $user], 200);
     }
 
     /**
      * @OA\Delete(
-     *     path="/users/{id}",
+     *     path="/api/users/{id}",
      *     summary="Delete a user",
      *     tags={"Users"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -110,17 +121,22 @@ class UserController extends Controller
      */
     public function destroy(int $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $user->delete();
+            return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error deleting user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al eliminar el usuario.'], 500);
         }
-        $user->delete();
-        return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
     }
     
     /**
      * @OA\Get(
-     *     path="/users/{id}/roles",
+     *     path="/api/users/{id}/roles",
      *     summary="Get roles for a user",
      *     tags={"Users"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -130,22 +146,25 @@ class UserController extends Controller
      */
     public function getRoles(int $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $roles = $user->roles()->get();
+            return response()->json([
+                'roles' => $roles
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user roles: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al obtener los roles del usuario.'], 500);
         }
-
-        $roles = $user->roles()->get();
-
-        return response()->json([
-            'roles' => $roles
-        ], 200);
     }
 
 
     /**
      * @OA\Get(
-     *     path="/users/{id}/permissions",
+     *     path="/api/users/{id}/permissions",
      *     summary="Get permissions for a user",
      *     tags={"Users"},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
@@ -155,21 +174,24 @@ class UserController extends Controller
      */
     public function getPermissions(int $id)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $permissions = $user->getAllPermissions();
+            return response()->json([
+                'permissions' => $permissions
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user permissions: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al obtener los permisos del usuario.'], 500);
         }
-
-        $permissions = $user->getAllPermissions();
-
-        return response()->json([
-            'permissions' => $permissions
-        ], 200);
     }
 
         /**
          * @OA\Get(
-         *     path="/users",
+         *     path="/api/users",
          *     summary="Get all users",
          *     tags={"Users"},
          *     @OA\Response(response=200, description="List of users")
@@ -177,15 +199,20 @@ class UserController extends Controller
          */
     public function index()
     {
-        $users = User::all();
-        return response()->json([
-            'users' => $users
-        ], 200);
+        try {
+            $users = User::all();
+            return response()->json([
+                'users' => $users
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching users: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
+        }
     }
 
         /**
          * @OA\Post(
-         *     path="/users/{userId}/permissions/{permissionId}",
+         *     path="/api/users/{userId}/permissions/{permissionId}",
          *     summary="Assign a permission to a user",
          *     tags={"Users"},
          *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
@@ -196,24 +223,26 @@ class UserController extends Controller
          */
     public function assignPermission(int $userId, int $permissionId)
     {
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($userId);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $permission = Permission::find($permissionId);
+            if (!$permission) {
+                return response()->json(['error' => 'Permiso no encontrado.'], 404);
+            }
+            $user->givePermissionTo($permission);
+            return response()->json(['success' => 'Permiso asignado al usuario exitosamente.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error assigning permission to user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al asignar el permiso al usuario.'], 500);
         }
-
-        $permission = Permission::find($permissionId);
-        if (!$permission) {
-            return response()->json(['error' => 'Permiso no encontrado.'], 404);
-        }
-
-        $user->givePermissionTo($permission);
-
-        return response()->json(['success' => 'Permiso asignado al usuario exitosamente.'], 200);
     }
 
         /**
          * @OA\Delete(
-         *     path="/users/{userId}/permissions/{permissionId}",
+         *     path="/api/users/{userId}/permissions/{permissionId}",
          *     summary="Revoke a permission from a user",
          *     tags={"Users"},
          *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
@@ -224,18 +253,20 @@ class UserController extends Controller
          */
     public function revokePermission(int $userId, int $permissionId)
     {
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json(['error' => 'Usuario no encontrado.'], 404);
+        try {
+            $user = User::find($userId);
+            if (!$user) {
+                return response()->json(['error' => 'Usuario no encontrado.'], 404);
+            }
+            $permission = Permission::find($permissionId);
+            if (!$permission) {
+                return response()->json(['error' => 'Permiso no encontrado.'], 404);
+            }
+            $user->revokePermissionTo($permission);
+            return response()->json(['success' => 'Permiso revocado del usuario exitosamente.'], 200);
+        } catch (\Exception $e) {
+            Log::error('Error revoking permission from user: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Ocurrió un error al revocar el permiso del usuario.'], 500);
         }
-
-        $permission = Permission::find($permissionId);
-        if (!$permission) {
-            return response()->json(['error' => 'Permiso no encontrado.'], 404);
-        }
-
-        $user->revokePermissionTo($permission);
-
-        return response()->json(['success' => 'Permiso revocado del usuario exitosamente.'], 200);
     }
 }
