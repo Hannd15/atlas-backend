@@ -14,27 +14,25 @@ class AuthorizationSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = [
-            'admin'=> [
-                'admin-permission-1',
-                'admin-permission-2',
-            ],
-            'profesor'=> [
-                'profesor-permission-1',
-                'profesor-permission-2',
-            ],
-            'estudiante'=> [
-                'estudiante-permission-1',
-                'estudiante-permission-2',
-            ]
-        ];
+    // Create 500 permissions
+    $permissions = \Database\Factories\PermissionFactory::new()->count(500)->create();
 
-        foreach ($roles as $role => $permissions) {
-            $roleModel = Role::create(['name' => $role]);
-            foreach ($permissions as $permission) {
-                $permission = Permission::create(['name' => $permission]);
-                $roleModel->givePermissionTo($permission);
-            }
+    // Create 500 roles
+    $roles = \Database\Factories\RoleFactory::new()->count(500)->create();
+
+        // Assign random permissions to each role
+        foreach ($roles as $role) {
+            $randomPermissions = $permissions->random(rand(10, 50));
+            $role->syncPermissions($randomPermissions);
+        }
+
+        // Create 500 users
+        $users = \App\Models\User::factory(500)->create();
+
+        // Assign random roles to each user
+        foreach ($users as $user) {
+            $randomRoles = $roles->random(rand(1, 10));
+            $user->syncRoles($randomRoles);
         }
     }
 }
