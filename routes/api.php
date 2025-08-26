@@ -28,3 +28,4 @@ Route::delete('/roles/{roleId}/permissions/{permissionId}', [RoleController::cla
 
 // PermissionController routes
 Route::get('/permissions', [App\Http\Controllers\PermissionController::class, 'index']);
+
