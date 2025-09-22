@@ -7,7 +7,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 use App\Http\Controllers\AuthController;
 
-Route::get('/auth/redirect', [AuthController::class, 'redirectToGoogle']);
+Route::get('/auth/login', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/callback', [AuthController::class, 'handleGoogleCallback']);
 
 

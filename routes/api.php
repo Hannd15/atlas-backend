@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\PermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+
+Route::middleware('auth:sanctum')->group(function () {
+
 
 // UserController CRUD and custom routes
 Route::get('/users', [UserController::class, 'index']);
@@ -27,5 +31,6 @@ Route::post('/roles/{roleId}/permissions/{permissionId}', [RoleController::class
 Route::delete('/roles/{roleId}/permissions/{permissionId}', [RoleController::class, 'revokePermission']);
 
 // PermissionController routes
-Route::get('/permissions', [App\Http\Controllers\PermissionController::class, 'index']);
+Route::get('/permissions', [PermissionController::class, 'index']);
 
+});

@@ -31,6 +31,6 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Redirect to your frontend with token
-        return redirect("https://your-frontend-app.com/login-success?token=$token");
+    return redirect(env('FRONTEND_URL')."/login-success?token=$token");
     }
 }
