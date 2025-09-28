@@ -1,61 +1,162 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🔐 ATLAS Auth Backend
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12.0-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 12.0">
+  <img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.2+">
+  <img src="https://img.shields.io/badge/API-REST-00D9FF?style=for-the-badge" alt="REST API">
+  <img src="https://img.shields.io/badge/Auth-OAuth2-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="OAuth2">
 </p>
 
-## About Laravel
+<p align="center">
+  <img src="https://img.shields.io/github/license/Hannd15/atlas-auth-backend?style=flat-square" alt="License">
+  <img src="https://img.shields.io/github/last-commit/Hannd15/atlas-auth-backend?style=flat-square" alt="Last Commit">
+  <img src="https://img.shields.io/github/workflow/status/Hannd15/atlas-auth-backend/tests?style=flat-square" alt="Tests">
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 Descripción
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**ATLAS Auth Backend** es el módulo de autenticación y autorización del sistema ATLAS, construido sobre **Laravel Framework v12.0**. Este backend constituye la **capa de seguridad principal** del ecosistema ATLAS, proporcionando servicios robustos de autenticación, autorización granular y gestión de usuarios con arquitectura modular y escalable.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🎯 Características Principales
 
-## Learning Laravel
+- 🔑 **Autenticación Multi-Canal** - Soporte para web, API y OAuth2 (Google)
+- 🛡️ **Autorización Granular** - Sistema de roles y permisos con Spatie Laravel Permission
+- 🔒 **Seguridad Reforzada** - Laravel Sanctum para gestión de tokens y sesiones
+- 📚 **Documentación Automática** - API REST documentada con OpenAPI/Swagger
+- 🧪 **Calidad Asegurada** - Suite completa de tests con PHPUnit
+- 🎨 **Código Estandarizado** - Laravel Pint para consistencia de estilo
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🏗️ Arquitectura
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Patrón MVC Extendido con Capas Adicionales
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   HTTP Layer    │ -> │  Service Layer  │ -> │ Repository Layer │
+│   Controllers   │    │    Business     │    │   Data Access   │
+│   Middleware    │    │     Logic       │    │   Persistence   │
+│   Requests      │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         |                       |                       |
+         v                       v                       v
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Auth & Authz   │    │     Events      │    │     Models      │
+│    Sanctum      │    │   Listeners     │    │   Eloquent ORM  │
+│    Spatie       │    │     Jobs        │    │   Factories     │
+│   Socialite     │    │                 │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
-## Laravel Sponsors
+### 🔧 Componentes Principales
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+#### **Capa HTTP**
+- **Controladores**: Gestión de solicitudes API con delegación a servicios
+- **Middleware**: Validación de autenticación, control de roles y manejo de sesiones
+- **Form Requests**: Validación de entrada y autorización de recursos
 
-### Premium Partners
+#### **Autenticación y Autorización**
+- **Laravel Sanctum**: Gestión de tokens SPA y API
+- **Spatie Laravel Permission**: Sistema granular de roles y permisos
+- **Laravel Socialite**: OAuth2 con Google y otros proveedores
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+#### **Modelos y Persistencia**
+- **Eloquent ORM**: Representación de entidades del dominio
+- **Repositorios**: Abstracción de la capa de persistencia
+- **Migraciones**: Esquema versionado de base de datos
+- **Factories & Seeders**: Datos de prueba e inicialización
 
-## Contributing
+## 🚀 Inicio Rápido
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Prerequisitos
 
-## Code of Conduct
+- PHP 8.2 o superior
+- Composer 2.x
+- Node.js 18+ y npm
+- Base de datos (MySQL/PostgreSQL/SQLite)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Instalación
 
-## Security Vulnerabilities
+```bash
+# Clonar el repositorio
+git clone https://github.com/Hannd15/atlas-auth-backend.git
+cd atlas-auth-backend
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Instalar dependencias PHP
+composer install
 
-## License
+# Instalar dependencias Node.js
+npm install
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Configurar variables de entorno
+cp .env.example .env
+php artisan key:generate
+
+# Configurar base de datos
+php artisan migrate --seed
+
+# Instalar Passport (si se usa)
+php artisan passport:install
+
+# Compilar assets
+npm run build
+```
+
+### Configuración OAuth2
+
+```bash
+# Configurar Google OAuth
+# Añadir en .env:
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+## 📖 Documentación API
+
+### Swagger/OpenAPI
+
+La documentación interactiva de la API está disponible en:
+
+```
+http://localhost:8000/api/documentation
+```
+
+## 📁 Estructura del Proyecto
+
+```
+atlas-auth-backend/
+├── app/
+│   ├── Http/Controllers/        # Controladores
+│   ├── Models/                  # Modelos Eloquent
+│   └── Providers/               # Service Providers
+├── config/                      # Configuraciones
+├── database/
+│   ├── migrations/              # Migraciones
+│   ├── seeders/                 # Seeders
+│   └── factories/               # Model Factories
+├── routes/                      # Rutas
+├── tests/                       # Tests automatizados
+└── storage/api-docs/            # Documentación Swagger
+```
+
+## 🛡️ Seguridad
+
+- **Tokens JWT** con Laravel Sanctum
+- **Rate Limiting** en endpoints críticos
+- **CORS** configurado para frontend
+- **Validación** robusta en todos los endpoints
+- **Encriptación** de datos sensibles
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear rama de feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit cambios (`git commit -m 'Añadir nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abrir Pull Request
+
+---
+
+<p align="center">
+  Construido con ❤️ usando <a href="https://laravel.com">Laravel</a>
+</p>
