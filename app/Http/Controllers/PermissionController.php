@@ -11,10 +11,12 @@ class PermissionController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/permissions",
+     *     path="/api/auth/permissions",
      *     summary="Get all permissions",
      *     tags={"Permissions"},
-     *     @OA\Response(response=200, description="List of permissions")
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="List of permissions", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Permission"))),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function index()

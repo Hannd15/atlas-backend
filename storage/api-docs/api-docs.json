@@ -6,27 +6,45 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/permissions": {
+        "/api/auth/permissions": {
             "get": {
                 "tags": [
                     "Permissions"
                 ],
                 "summary": "Get all permissions",
-                "operationId": "27bb1606a7b293d1d49f57bb94ae71f7",
+                "operationId": "c6f4be15fe8e14a061028344d803e768",
                 "responses": {
                     "200": {
-                        "description": "List of permissions"
+                        "description": "List of permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Permission"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/roles/{id}": {
+        "/api/auth/roles/{id}": {
             "put": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Update a role",
-                "operationId": "786d6990093a8eb3a56931f19a827e43",
+                "operationId": "54229396537cd4ddea9f666af68e685f",
                 "parameters": [
                     {
                         "name": "id",
@@ -57,19 +75,37 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Role updated"
+                        "description": "Role updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
                     },
                     "404": {
                         "description": "Role not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Delete a role",
-                "operationId": "8285c46981c60ad600aa4077307aec04",
+                "operationId": "05affe96054c3b8f28d18b3a3d24e839",
                 "parameters": [
                     {
                         "name": "id",
@@ -81,34 +117,60 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Role deleted"
                     },
                     "404": {
                         "description": "Role not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/roles": {
+        "/api/auth/roles": {
             "get": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Get all roles",
-                "operationId": "77e3636d8592997ce9d6d27b50857a69",
+                "operationId": "1b04ebc6a5a34e070ce93cd0075969d8",
                 "responses": {
                     "200": {
-                        "description": "List of roles"
+                        "description": "List of roles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Role"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
                     "Roles"
                 ],
                 "summary": "Create a new role",
-                "operationId": "97b14ba5623e93b88311859dc964e8ff",
+                "operationId": "d6750035b235d5f7008627fc7df491e6",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -129,18 +191,37 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Role created"
+                        "description": "Role created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/roles/{id}/permissions": {
+        "/api/auth/roles/{id}/permissions": {
             "get": {
                 "tags": [
-                    "Roles"
+                    "Roles",
+                    "Permissions"
                 ],
                 "summary": "Get permissions for a role",
-                "operationId": "84bccc6a2fd1c2fed89a35ac00cc7593",
+                "operationId": "e5946a641789c5585b43d4d07538603e",
                 "parameters": [
                     {
                         "name": "id",
@@ -153,21 +234,40 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Role permissions"
+                        "description": "Role permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Permission"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "Role not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/roles/{roleId}/permissions/{permissionId}": {
+        "/api/auth/roles/{roleId}/permissions/{permissionId}": {
             "post": {
                 "tags": [
-                    "Roles"
+                    "Roles",
+                    "Permissions"
                 ],
                 "summary": "Assign a permission to a role",
-                "operationId": "9850870e0126287277beeec301f924ac",
+                "operationId": "3337e39a430549e3a1a7c98f9589eb84",
                 "parameters": [
                     {
                         "name": "roleId",
@@ -192,15 +292,24 @@
                     },
                     "404": {
                         "description": "Role or permission not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
-                    "Roles"
+                    "Roles",
+                    "Permissions"
                 ],
                 "summary": "Revoke a permission from a role",
-                "operationId": "fde424978373634a9184631f495edf81",
+                "operationId": "b0a377ffbeece7996283c603fbafa802",
                 "parameters": [
                     {
                         "name": "roleId",
@@ -220,34 +329,60 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Permission revoked"
                     },
                     "404": {
                         "description": "Role or permission not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/users": {
+        "/api/auth/users": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get all users",
-                "operationId": "c457726701591d1183b53aa71fc13441",
+                "operationId": "b30dc2968e9afb4993b997b6f4833718",
                 "responses": {
                     "200": {
-                        "description": "List of users"
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Create a new user",
-                "operationId": "592819a0265360b2014512d6dbfaf0e7",
+                "operationId": "d9b614bef6deb4083d7160d565a3c505",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -263,10 +398,12 @@
                                         "type": "string"
                                     },
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "email"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "password"
                                     }
                                 },
                                 "type": "object"
@@ -276,18 +413,36 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User created"
+                        "description": "User created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/users/{id}": {
+        "/api/auth/users/{id}": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Get a user by ID",
-                "operationId": "36a33ff774d5cba33c039dec2c3e0287",
+                "operationId": "6fb5fdcad7cbe56a440b61a3199ba661",
                 "parameters": [
                     {
                         "name": "id",
@@ -300,19 +455,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User found"
+                        "description": "User found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "User not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Update a user",
-                "operationId": "b9091397c8b25f12c6adb74be6ce3a5a",
+                "operationId": "fcbb6e9607caa5bd628196124be1a8a6",
                 "parameters": [
                     {
                         "name": "id",
@@ -333,10 +503,12 @@
                                         "type": "string"
                                     },
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "email"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "password"
                                     }
                                 },
                                 "type": "object"
@@ -346,19 +518,37 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User updated"
+                        "description": "User updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error"
                     },
                     "404": {
                         "description": "User not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "Delete a user",
-                "operationId": "fa56cffde745d3f152f95cbacd936c0b",
+                "operationId": "289822e351ea9e4cd69a686cc18fa74c",
                 "parameters": [
                     {
                         "name": "id",
@@ -370,22 +560,31 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "User deleted"
                     },
                     "404": {
                         "description": "User not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/users/{id}/roles": {
+        "/api/auth/users/{id}/roles": {
             "get": {
                 "tags": [
-                    "Users"
+                    "Users",
+                    "Roles"
                 ],
                 "summary": "Get roles for a user",
-                "operationId": "9f544b3e35a4360b60ac7c4b63b17710",
+                "operationId": "ce53efc4390e73b3c83eb2ec734c89ee",
                 "parameters": [
                     {
                         "name": "id",
@@ -398,21 +597,40 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User roles"
+                        "description": "User roles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Role"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "User not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/users/{id}/permissions": {
+        "/api/auth/users/{id}/permissions": {
             "get": {
                 "tags": [
-                    "Users"
+                    "Users",
+                    "Permissions"
                 ],
                 "summary": "Get permissions for a user",
-                "operationId": "4adf50b9cbad3c95ffaac9d22c8c3f72",
+                "operationId": "935b4357e3356a74e8f17c9f6b27b4f1",
                 "parameters": [
                     {
                         "name": "id",
@@ -425,21 +643,40 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User permissions"
+                        "description": "User permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Permission"
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
                         "description": "User not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
-        "/api/users/{userId}/permissions/{permissionId}": {
+        "/api/auth/users/{userId}/permissions/{permissionId}": {
             "post": {
                 "tags": [
-                    "Users"
+                    "Users",
+                    "Permissions"
                 ],
                 "summary": "Assign a permission to a user",
-                "operationId": "c8f2235551856021c1952049e79f3560",
+                "operationId": "e500c854a99ce439c696819702173741",
                 "parameters": [
                     {
                         "name": "userId",
@@ -464,15 +701,24 @@
                     },
                     "404": {
                         "description": "User or permission not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
-                    "Users"
+                    "Users",
+                    "Permissions"
                 ],
                 "summary": "Revoke a permission from a user",
-                "operationId": "5922712ca40f754b7182741f593bf6aa",
+                "operationId": "c1d0677fafc82d94151babfefeabaf44",
                 "parameters": [
                     {
                         "name": "userId",
@@ -492,13 +738,89 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Permission revoked"
                     },
                     "404": {
                         "description": "User or permission not found"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Jane Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "jane@example.com"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Role": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    }
+                },
+                "type": "object"
+            },
+            "Permission": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "users.create"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Authentication using Laravel Sanctum bearer token",
+                "bearerFormat": "Bearer",
+                "scheme": "bearer"
             }
         }
     },

@@ -14,12 +14,14 @@ class RoleController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/api/roles/{id}",
+     *     path="/api/auth/roles/{id}",
      *     summary="Delete a role",
      *     tags={"Roles"},
+     *     security={{"sanctum":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Role deleted"),
-     *     @OA\Response(response=404, description="Role not found")
+     *     @OA\Response(response=204, description="Role deleted"),
+     *     @OA\Response(response=404, description="Role not found"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function destroy(int $id) {
@@ -48,9 +50,10 @@ class RoleController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/roles",
+     *     path="/api/auth/roles",
      *     summary="Create a new role",
      *     tags={"Roles"},
+     *     security={{"sanctum":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -58,7 +61,9 @@ class RoleController extends Controller
      *             @OA\Property(property="name", type="string")
      *         )
      *     ),
-     *     @OA\Response(response=201, description="Role created")
+     *     @OA\Response(response=201, description="Role created", @OA\JsonContent(ref="#/components/schemas/Role")),
+     *     @OA\Response(response=400, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function create(Request $request){
@@ -78,9 +83,10 @@ class RoleController extends Controller
     
     /**
      * @OA\Put(
-     *     path="/api/roles/{id}",
+     *     path="/api/auth/roles/{id}",
      *     summary="Update a role",
      *     tags={"Roles"},
+     *     security={{"sanctum":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\RequestBody(
      *         required=true,
@@ -89,8 +95,10 @@ class RoleController extends Controller
      *             @OA\Property(property="name", type="string")
      *         )
      *     ),
-     *     @OA\Response(response=200, description="Role updated"),
-     *     @OA\Response(response=404, description="Role not found")
+     *     @OA\Response(response=200, description="Role updated", @OA\JsonContent(ref="#/components/schemas/Role")),
+     *     @OA\Response(response=400, description="Validation error"),
+     *     @OA\Response(response=404, description="Role not found"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function update(Request $request, int $id) {
@@ -115,10 +123,12 @@ class RoleController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/roles",
+     *     path="/api/auth/roles",
      *     summary="Get all roles",
      *     tags={"Roles"},
-     *     @OA\Response(response=200, description="List of roles")
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="List of roles", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Role"))),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function index(){
@@ -134,12 +144,14 @@ class RoleController extends Controller
     }
     /**
      * @OA\Get(
-     *     path="/api/roles/{id}/permissions",
+     *     path="/api/auth/roles/{id}/permissions",
      *     summary="Get permissions for a role",
-     *     tags={"Roles"},
+     *     tags={"Roles","Permissions"},
+     *     security={{"sanctum":{}}},
      *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Role permissions"),
-     *     @OA\Response(response=404, description="Role not found")
+     *     @OA\Response(response=200, description="Role permissions", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Permission"))),
+     *     @OA\Response(response=404, description="Role not found"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function getPermissions(int $id)
@@ -160,13 +172,15 @@ class RoleController extends Controller
     }
     /**
      * @OA\Post(
-     *     path="/api/roles/{roleId}/permissions/{permissionId}",
+     *     path="/api/auth/roles/{roleId}/permissions/{permissionId}",
      *     summary="Assign a permission to a role",
-     *     tags={"Roles"},
+     *     tags={"Roles","Permissions"},
+     *     security={{"sanctum":{}}},
      *     @OA\Parameter(name="roleId", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\Parameter(name="permissionId", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\Response(response=200, description="Permission assigned"),
-     *     @OA\Response(response=404, description="Role or permission not found")
+     *     @OA\Response(response=404, description="Role or permission not found"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function assignPermission(int $roleId, int $permissionId)
@@ -190,13 +204,15 @@ class RoleController extends Controller
     }
     /**
      * @OA\Delete(
-     *     path="/api/roles/{roleId}/permissions/{permissionId}",
+     *     path="/api/auth/roles/{roleId}/permissions/{permissionId}",
      *     summary="Revoke a permission from a role",
-     *     tags={"Roles"},
+     *     tags={"Roles","Permissions"},
+     *     security={{"sanctum":{}}},
      *     @OA\Parameter(name="roleId", in="path", required=true, @OA\Schema(type="integer")),
      *     @OA\Parameter(name="permissionId", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Permission revoked"),
-     *     @OA\Response(response=404, description="Role or permission not found")
+     *     @OA\Response(response=204, description="Permission revoked"),
+     *     @OA\Response(response=404, description="Role or permission not found"),
+     *     @OA\Response(response=401, description="Unauthorized")
      * )
      */
     public function revokePermission(int $roleId, int $permissionId){

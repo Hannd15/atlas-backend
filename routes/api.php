@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{userId}/permissions/{permissionId}', [UserController::class, 'assignPermission']);
         Route::delete('/users/{userId}/permissions/{permissionId}', [UserController::class, 'revokePermission']);
         
-        // RoleController CRUD and custom routes
+    // RoleController CRUD and custom routes
         Route::get('/roles', [RoleController::class, 'index']);
         Route::post('/roles', [RoleController::class, 'create']);
         Route::put('/roles/{id}', [RoleController::class, 'update']);
