@@ -1,36 +1,33 @@
 <?php
 
 use App\Http\Controllers\PermissionController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::prefix('/auth')->group(function(){
-
-        // UserController CRUD and custom routes
+    Route::prefix('/auth')->group(function () {
+        // User routes
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users', [UserController::class, 'store']);
         Route::get('/users/{id}', [UserController::class, 'show']);
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
-        Route::get('/users/{id}/roles', [UserController::class, 'getRoles']);
-        Route::get('/users/{id}/permissions', [UserController::class, 'getPermissions']);
-        Route::get('/users/{id}/info', [UserController::class, 'getInfo']);
-        Route::post('/users/{userId}/permissions/{permissionId}', [UserController::class, 'assignPermission']);
-        Route::delete('/users/{userId}/permissions/{permissionId}', [UserController::class, 'revokePermission']);
-        
-    // RoleController CRUD and custom routes
+        Route::get('/users/dropdown', [UserController::class, 'dropdown']);
+
+        // Role routes
         Route::get('/roles', [RoleController::class, 'index']);
-        Route::post('/roles', [RoleController::class, 'create']);
+        Route::post('/roles', [RoleController::class, 'store']);
+        Route::get('/roles/{id}', [RoleController::class, 'show']);
         Route::put('/roles/{id}', [RoleController::class, 'update']);
         Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
-        Route::get('/roles/{id}/permissions', [RoleController::class, 'getPermissions']);
-        Route::post('/roles/{roleId}/permissions/{permissionId}', [RoleController::class, 'assignPermission']);
-        Route::delete('/roles/{roleId}/permissions/{permissionId}', [RoleController::class, 'revokePermission']);
-        
-        // PermissionController routes
+        Route::get('/roles/dropdown', [RoleController::class, 'dropdown']);
+
+        // Permission routes
         Route::get('/permissions', [PermissionController::class, 'index']);
+        Route::get('/permissions/{id}', [PermissionController::class, 'show']);
+        Route::put('/permissions/{id}', [PermissionController::class, 'update']);
+        Route::delete('/permissions/{id}', [PermissionController::class, 'destroy']);
+        Route::get('/permissions/dropdown', [PermissionController::class, 'dropdown']);
     });
 });

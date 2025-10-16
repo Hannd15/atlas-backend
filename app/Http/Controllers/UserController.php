@@ -2,32 +2,151 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Log;
-
 use App\Models\User;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/auth/users",
+     *     summary="Get all users",
+     *     description="Retrieve a list of all users with their assigned roles",
+     *     tags={"Users"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of users retrieved successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="users", type="array", @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="roles_list", type="string", example="Admin, Editor"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             ))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener los usuarios.")
+     *         )
+     *     )
+     * )
+     */
+    public function index()
+    {
+        try {
+            $users = User::with('roles')->get()->map(function ($user) {
+                $user->roles_list = $user->roles->pluck('name')->implode(', ');
+
+                return $user;
+            });
+
+            return response()->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching users: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
+        }
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/auth/users",
      *     summary="Create a new user",
+     *     description="Create a new user with optional role assignments",
      *     tags={"Users"},
      *     security={{"sanctum":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *         description="User data",
+     *
      *         @OA\JsonContent(
      *             required={"name","email","password"},
-     *             @OA\Property(property="name", type="string"),
-     *             @OA\Property(property="email", type="string", format="email"),
-     *             @OA\Property(property="password", type="string", format="password")
+     *
+     *             @OA\Property(
+     *                 property="name",
+     *                 type="string",
+     *                 description="User's full name (max 255 characters)",
+     *                 example="John Doe"
+     *             ),
+     *             @OA\Property(
+     *                 property="email",
+     *                 type="string",
+     *                 format="email",
+     *                 description="User's email address (must be unique, max 255 characters)",
+     *                 example="john@example.com"
+     *             ),
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 format="password",
+     *                 description="User's password (minimum 8 characters)",
+     *                 example="password123"
+     *             ),
+     *             @OA\Property(
+     *                 property="roles",
+     *                 type="array",
+     *                 description="Array of role IDs to assign to the user",
+     *
+     *                 @OA\Items(type="integer", example=1)
+     *             )
      *         )
      *     ),
-     *     @OA\Response(response=201, description="User created", @OA\JsonContent(ref="#/components/schemas/User")),
-     *     @OA\Response(response=400, description="Validation error"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="User created successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="The email has already been taken."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al crear el usuario.")
+     *         )
+     *     )
      * )
      */
     public function store(Request $request)
@@ -37,12 +156,20 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
+                'roles' => 'nullable|array',
+                'roles.*' => 'integer|exists:roles,id',
             ]);
             $validated['password'] = bcrypt($validated['password']);
             $user = User::create($validated);
+
+            if (isset($validated['roles'])) {
+                $user->assignRole(Role::whereIn('id', $validated['roles'])->get());
+            }
+
             return response()->json(['user' => $user], 201);
         } catch (\Exception $e) {
-            Log::error('Error creating user: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error creating user: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json(['error' => 'Ocurrió un error al crear el usuario.'], 500);
         }
     }
@@ -51,24 +178,77 @@ class UserController extends Controller
      * @OA\Get(
      *     path="/api/auth/users/{id}",
      *     summary="Get a user by ID",
+     *     description="Retrieve a single user with their assigned roles",
      *     tags={"Users"},
      *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="User found", @OA\JsonContent(ref="#/components/schemas/User")),
-     *     @OA\Response(response=404, description="User not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="User ID",
+     *
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="User retrieved successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="roles_list", type="array", @OA\Items(
+     *                     @OA\Property(property="value", type="integer", example=1),
+     *                     @OA\Property(property="label", type="string", example="Admin")
+     *                 )),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Usuario no encontrado.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener el usuario.")
+     *         )
+     *     )
      * )
      */
     public function show(int $id)
     {
         try {
-            $user = User::find($id);
-            if (!$user) {
+            $user = User::with('roles')->find($id);
+            if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
+            $user->roles_list = $user->roles->map(function ($role) {
+                return ['value' => $role->id, 'label' => $role->name];
+            });
+
             return response()->json(['user' => $user], 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching user: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error fetching user: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json(['error' => 'Ocurrió un error al obtener el usuario.'], 500);
         }
     }
@@ -77,42 +257,132 @@ class UserController extends Controller
      * @OA\Put(
      *     path="/api/auth/users/{id}",
      *     summary="Update a user",
+     *     description="Update an existing user's information and/or role assignments",
      *     tags={"Users"},
      *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="User ID",
+     *
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *         description="User data to update (all fields are optional)",
+     *
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string"),
-     *             @OA\Property(property="email", type="string", format="email"),
-     *             @OA\Property(property="password", type="string", format="password")
+     *
+     *             @OA\Property(
+     *                 property="name",
+     *                 type="string",
+     *                 description="User's full name (max 255 characters)",
+     *                 example="Jane Doe"
+     *             ),
+     *             @OA\Property(
+     *                 property="email",
+     *                 type="string",
+     *                 format="email",
+     *                 description="User's email address (must be unique, max 255 characters)",
+     *                 example="jane@example.com"
+     *             ),
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 format="password",
+     *                 description="User's new password (minimum 8 characters)",
+     *                 example="newpassword123"
+     *             ),
+     *             @OA\Property(
+     *                 property="roles",
+     *                 type="array",
+     *                 description="Array of role IDs to sync with the user",
+     *
+     *                 @OA\Items(type="integer", example=1)
+     *             )
      *         )
      *     ),
-     *     @OA\Response(response=200, description="User updated", @OA\JsonContent(ref="#/components/schemas/User")),
-     *     @OA\Response(response=400, description="Validation error"),
-     *     @OA\Response(response=404, description="User not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="user", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="Jane Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="jane@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="The email has already been taken."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Usuario no encontrado.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al actualizar el usuario.")
+     *         )
+     *     )
      * )
      */
     public function update(Request $request, int $id)
     {
         try {
             $user = User::find($id);
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
             $validated = $request->validate([
                 'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $id,
+                'email' => 'sometimes|required|string|email|max:255|unique:users,email,'.$id,
                 'password' => 'sometimes|required|string|min:8',
+                'roles' => 'nullable|array',
+                'roles.*' => 'integer|exists:roles,id',
             ]);
             if (isset($validated['password'])) {
                 $validated['password'] = bcrypt($validated['password']);
             }
             $user->update($validated);
+
+            if (isset($validated['roles'])) {
+                $user->syncRoles(Role::whereIn('id', $validated['roles'])->get());
+            }
+
             return response()->json(['user' => $user], 200);
         } catch (\Exception $e) {
-            Log::error('Error updating user: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error updating user: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json(['error' => 'Ocurrió un error al actualizar el usuario.'], 500);
         }
     }
@@ -121,172 +391,115 @@ class UserController extends Controller
      * @OA\Delete(
      *     path="/api/auth/users/{id}",
      *     summary="Delete a user",
+     *     description="Remove a user from the system",
      *     tags={"Users"},
      *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=204, description="User deleted"),
-     *     @OA\Response(response=404, description="User not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="User ID",
+     *
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Usuario eliminado correctamente.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Usuario no encontrado.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al eliminar el usuario.")
+     *         )
+     *     )
      * )
      */
     public function destroy(int $id)
     {
         try {
             $user = User::find($id);
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
             $user->delete();
+
             return response()->json(['message' => 'Usuario eliminado correctamente.'], 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting user: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error deleting user: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json(['error' => 'Ocurrió un error al eliminar el usuario.'], 500);
         }
     }
-    
-    /**
-     * @OA\Get(
-     *     path="/api/auth/users/{id}/roles",
-     *     summary="Get roles for a user",
-     *     tags={"Users","Roles"},
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="User roles", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Role"))),
-     *     @OA\Response(response=404, description="User not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
-     * )
-     */
-    public function getRoles(int $id)
-    {
-        try {
-            $user = User::find($id);
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado.'], 404);
-            }
-            $roles = $user->roles()->get();
-            return response()->json([
-                'roles' => $roles
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('Error fetching user roles: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['error' => 'Ocurrió un error al obtener los roles del usuario.'], 500);
-        }
-    }
-
 
     /**
      * @OA\Get(
-     *     path="/api/auth/users/{id}/permissions",
-     *     summary="Get permissions for a user",
-     *     tags={"Users","Permissions"},
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="User permissions", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Permission"))),
-     *     @OA\Response(response=404, description="User not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
-     * )
-     */
-    public function getPermissions(int $id)
-    {
-        try {
-            $user = User::find($id);
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado.'], 404);
-            }
-            $permissions = $user->getAllPermissions();
-            return response()->json([
-                'permissions' => $permissions
-            ], 200);
-        } catch (\Exception $e) {
-            Log::error('Error fetching user permissions: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['error' => 'Ocurrió un error al obtener los permisos del usuario.'], 500);
-        }
-    }
-
-    /**
-     * @OA\Get(
-     *     path="/api/auth/users",
-     *     summary="Get all users",
+     *     path="/api/auth/users/dropdown",
+     *     summary="Get users for dropdown",
+     *     description="Retrieve all users formatted for dropdown/select components",
      *     tags={"Users"},
      *     security={{"sanctum":{}}},
-     *     @OA\Response(response=200, description="List of users", @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of users for dropdown retrieved successfully",
+     *
+     *         @OA\JsonContent(
+     *             type="array",
+     *
+     *             @OA\Items(
+     *
+     *                 @OA\Property(property="value", type="integer", example=1),
+     *                 @OA\Property(property="label", type="string", example="John Doe")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener los usuarios.")
+     *         )
+     *     )
      * )
      */
-    public function index()
+    public function dropdown()
     {
         try {
-            $users = User::all();
-            return response()->json([
-                'users' => $users
-            ], 200);
+            $users = User::all()->map(function ($user) {
+                return ['value' => $user->id, 'label' => $user->name];
+            });
+
+            return response()->json($users, 200);
         } catch (\Exception $e) {
-            Log::error('Error fetching users: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error fetching users for dropdown: '.$e->getMessage(), ['exception' => $e]);
+
             return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
-        }
-    }
-
-    /**
-     * @OA\Post(
-     *     path="/api/auth/users/{userId}/permissions/{permissionId}",
-     *     summary="Assign a permission to a user",
-     *     tags={"Users","Permissions"},
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Parameter(name="permissionId", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=200, description="Permission assigned"),
-     *     @OA\Response(response=404, description="User or permission not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
-     * )
-     */
-    public function assignPermission(int $userId, int $permissionId)
-    {
-        try {
-            $user = User::find($userId);
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado.'], 404);
-            }
-            $permission = Permission::find($permissionId);
-            if (!$permission) {
-                return response()->json(['error' => 'Permiso no encontrado.'], 404);
-            }
-            $user->givePermissionTo($permission);
-            return response()->json(['success' => 'Permiso asignado al usuario exitosamente.'], 200);
-        } catch (\Exception $e) {
-            Log::error('Error assigning permission to user: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['error' => 'Ocurrió un error al asignar el permiso al usuario.'], 500);
-        }
-    }
-
-    /**
-     * @OA\Delete(
-     *     path="/api/auth/users/{userId}/permissions/{permissionId}",
-     *     summary="Revoke a permission from a user",
-     *     tags={"Users","Permissions"},
-     *     security={{"sanctum":{}}},
-     *     @OA\Parameter(name="userId", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Parameter(name="permissionId", in="path", required=true, @OA\Schema(type="integer")),
-     *     @OA\Response(response=204, description="Permission revoked"),
-     *     @OA\Response(response=404, description="User or permission not found"),
-     *     @OA\Response(response=401, description="Unauthorized")
-     * )
-     */
-    public function revokePermission(int $userId, int $permissionId)
-    {
-        try {
-            $user = User::find($userId);
-            if (!$user) {
-                return response()->json(['error' => 'Usuario no encontrado.'], 404);
-            }
-            $permission = Permission::find($permissionId);
-            if (!$permission) {
-                return response()->json(['error' => 'Permiso no encontrado.'], 404);
-            }
-            $user->revokePermissionTo($permission);
-            return response()->json(['success' => 'Permiso revocado del usuario exitosamente.'], 200);
-        } catch (\Exception $e) {
-            Log::error('Error revoking permission from user: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['error' => 'Ocurrió un error al revocar el permiso del usuario.'], 500);
         }
     }
 }

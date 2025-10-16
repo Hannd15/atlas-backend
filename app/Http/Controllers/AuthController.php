@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -21,9 +21,9 @@ class AuthController extends Controller
         $user = User::updateOrCreate(
             ['email' => $googleUser->getEmail()],
             [
-                'name'      => $googleUser->getName(),
+                'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
-                'avatar'    => $googleUser->getAvatar(),
+                'avatar' => $googleUser->getAvatar(),
             ]
         );
 
@@ -31,6 +31,6 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Redirect to your frontend with token
-    return redirect(env('FRONTEND_URL')."/login-success?token=$token");
+        return redirect(env('FRONTEND_URL')."/login-success?token=$token");
     }
 }

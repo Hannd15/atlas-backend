@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 /**
  * @OA\Info(
  *     title="ATLAS Backend API",
@@ -20,26 +18,47 @@ use Illuminate\Http\Request;
  * )
  *
  * @OA\Components(
+ *
  *   @OA\Schema(
  *     schema="User",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="Jane Doe"),
  *     @OA\Property(property="email", type="string", format="email", example="jane@example.com"),
- *     @OA\Property(property="roles", type="array", @OA\Items(type="string")),
- *     @OA\Property(property="permissions", type="array", @OA\Items(type="string"))
+ *     @OA\Property(property="roles_list", type="string", example="admin, editor"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
  *   ),
+ *
  *   @OA\Schema(
  *     schema="Role",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="admin")
+ *     @OA\Property(property="name", type="string", example="admin"),
+ *     @OA\Property(property="permissions_list", type="string", example="users.create, users.edit"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
  *   ),
+ *
  *   @OA\Schema(
  *     schema="Permission",
  *     type="object",
+ *
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="users.create")
+ *     @OA\Property(property="name", type="string", example="users.create"),
+ *     @OA\Property(property="roles_list", type="string", example="admin, editor"),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ *   ),
+ *
+ *   @OA\Schema(
+ *     schema="Dropdown",
+ *     type="object",
+ *
+ *     @OA\Property(property="value", type="integer", example=1),
+ *     @OA\Property(property="label", type="string", example="Jane Doe")
  *   )
  * )
  */

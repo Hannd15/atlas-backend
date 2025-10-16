@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class AuthorizationSeeder extends Seeder
@@ -14,11 +12,11 @@ class AuthorizationSeeder extends Seeder
      */
     public function run(): void
     {
-    // Create 500 permissions
-    $permissions = \Database\Factories\PermissionFactory::new()->count(500)->create();
+        // Create 500 permissions
+        $permissions = \Database\Factories\PermissionFactory::new()->count(500)->create();
 
-    // Create 500 roles
-    $roles = \Database\Factories\RoleFactory::new()->count(500)->create();
+        // Create 500 roles
+        $roles = \Database\Factories\RoleFactory::new()->count(500)->create();
 
         // Assign random permissions to each role
         foreach ($roles as $role) {

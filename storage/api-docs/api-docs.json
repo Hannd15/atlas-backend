@@ -12,23 +12,71 @@
                     "Permissions"
                 ],
                 "summary": "Get all permissions",
+                "description": "Retrieve a list of all permissions with their associated roles",
                 "operationId": "c6f4be15fe8e14a061028344d803e768",
                 "responses": {
                     "200": {
-                        "description": "List of permissions",
+                        "description": "List of permissions retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Permission"
-                                    }
+                                    "properties": {
+                                        "permissions": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "edit-posts"
+                                                    },
+                                                    "guard_name": {
+                                                        "type": "string",
+                                                        "example": "web"
+                                                    },
+                                                    "roles_list": {
+                                                        "type": "string",
+                                                        "example": "Admin, Editor"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los permisos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -38,24 +86,143 @@
                 ]
             }
         },
-        "/api/auth/roles/{id}": {
-            "put": {
+        "/api/auth/permissions/{id}": {
+            "get": {
                 "tags": [
-                    "Roles"
+                    "Permissions"
                 ],
-                "summary": "Update a role",
-                "operationId": "54229396537cd4ddea9f666af68e685f",
+                "summary": "Get a permission by ID",
+                "description": "Retrieve a single permission with its associated roles",
+                "operationId": "a32e7e8632aa3a3b4e026b4dece87da0",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Permission ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Permission retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "permission": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "edit-posts"
+                                                },
+                                                "guard_name": {
+                                                    "type": "string",
+                                                    "example": "web"
+                                                },
+                                                "roles_list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "Admin"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Permission not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Permiso no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener el permiso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Update a permission",
+                "description": "Update the name of an existing permission",
+                "operationId": "d1ba6b3a88c4425b4e00d152c6758e45",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Permission ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "requestBody": {
+                    "description": "Permission data to update",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -65,7 +232,9 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "description": "Permission name (must be unique, max 255 characters)",
+                                        "type": "string",
+                                        "example": "edit-posts"
                                     }
                                 },
                                 "type": "object"
@@ -75,23 +244,95 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Role updated",
+                        "description": "Permission updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Role"
+                                    "properties": {
+                                        "permission": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "edit-posts"
+                                                },
+                                                "guard_name": {
+                                                    "type": "string",
+                                                    "example": "web"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Role not found"
+                        "description": "Permission not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Permiso no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al actualizar el permiso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -102,29 +343,133 @@
             },
             "delete": {
                 "tags": [
-                    "Roles"
+                    "Permissions"
                 ],
-                "summary": "Delete a role",
-                "operationId": "05affe96054c3b8f28d18b3a3d24e839",
+                "summary": "Delete a permission",
+                "description": "Remove a permission from the system",
+                "operationId": "383b3b14f09626312d085989a03c41d5",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Permission ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Role deleted"
+                    "200": {
+                        "description": "Permission deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Permiso eliminado correctamente."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Role not found"
+                        "description": "Permission not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Permiso no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al eliminar el permiso."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/permissions/dropdown": {
+            "get": {
+                "tags": [
+                    "Permissions"
+                ],
+                "summary": "Get permissions for dropdown",
+                "description": "Retrieve all permissions formatted for dropdown/select components",
+                "operationId": "bb92b9118e416dd6c11f9b88dd49c000",
+                "responses": {
+                    "200": {
+                        "description": "List of permissions for dropdown retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "example": "edit-posts"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los permisos."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -140,23 +485,71 @@
                     "Roles"
                 ],
                 "summary": "Get all roles",
+                "description": "Retrieve a list of all roles with their associated permissions",
                 "operationId": "1b04ebc6a5a34e070ce93cd0075969d8",
                 "responses": {
                     "200": {
-                        "description": "List of roles",
+                        "description": "List of roles retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Role"
-                                    }
+                                    "properties": {
+                                        "roles": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Admin"
+                                                    },
+                                                    "guard_name": {
+                                                        "type": "string",
+                                                        "example": "web"
+                                                    },
+                                                    "permissions_list": {
+                                                        "type": "string",
+                                                        "example": "edit-posts, delete-posts"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los roles."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -170,8 +563,10 @@
                     "Roles"
                 ],
                 "summary": "Create a new role",
-                "operationId": "d6750035b235d5f7008627fc7df491e6",
+                "description": "Create a new role with optional permissions",
+                "operationId": "0257d525402c6b6b3705f8e060928f5f",
                 "requestBody": {
+                    "description": "Role data",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -181,7 +576,17 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "description": "Role name (must be unique, max 255 characters)",
+                                        "type": "string",
+                                        "example": "Editor"
+                                    },
+                                    "permissions": {
+                                        "description": "Array of permission IDs to assign to the role",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -191,20 +596,79 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Role created",
+                        "description": "Role created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Role"
+                                    "properties": {
+                                        "role": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Editor"
+                                                },
+                                                "guard_name": {
+                                                    "type": "string",
+                                                    "example": "web"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al crear el rol."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -214,43 +678,114 @@
                 ]
             }
         },
-        "/api/auth/roles/{id}/permissions": {
+        "/api/auth/roles/{id}": {
             "get": {
                 "tags": [
-                    "Roles",
-                    "Permissions"
+                    "Roles"
                 ],
-                "summary": "Get permissions for a role",
-                "operationId": "e5946a641789c5585b43d4d07538603e",
+                "summary": "Get a role by ID",
+                "description": "Retrieve a single role with its associated permissions",
+                "operationId": "a257b8172b5a429dc4af036f41d05af1",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Role ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Role permissions",
+                        "description": "Role retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Permission"
-                                    }
+                                    "properties": {
+                                        "role": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "guard_name": {
+                                                    "type": "string",
+                                                    "example": "web"
+                                                },
+                                                "permissions_list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "edit-posts"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Role not found"
+                        "description": "Role not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener el rol."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -258,43 +793,143 @@
                         "sanctum": []
                     }
                 ]
-            }
-        },
-        "/api/auth/roles/{roleId}/permissions/{permissionId}": {
-            "post": {
+            },
+            "put": {
                 "tags": [
-                    "Roles",
-                    "Permissions"
+                    "Roles"
                 ],
-                "summary": "Assign a permission to a role",
-                "operationId": "3337e39a430549e3a1a7c98f9589eb84",
+                "summary": "Update a role",
+                "description": "Update an existing role's name and/or permissions",
+                "operationId": "54229396537cd4ddea9f666af68e685f",
                 "parameters": [
                     {
-                        "name": "roleId",
+                        "name": "id",
                         "in": "path",
+                        "description": "Role ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "permissionId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
+                "requestBody": {
+                    "description": "Role data to update (all fields are optional)",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Role name (must be unique, max 255 characters)",
+                                        "type": "string",
+                                        "example": "Super Admin"
+                                    },
+                                    "permissions": {
+                                        "description": "Array of permission IDs to sync with the role",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "Permission assigned"
+                        "description": "Role updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "role": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Super Admin"
+                                                },
+                                                "guard_name": {
+                                                    "type": "string",
+                                                    "example": "web"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The name has already been taken."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Role or permission not found"
+                        "description": "Role not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al actualizar el rol."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -305,38 +940,133 @@
             },
             "delete": {
                 "tags": [
-                    "Roles",
-                    "Permissions"
+                    "Roles"
                 ],
-                "summary": "Revoke a permission from a role",
-                "operationId": "b0a377ffbeece7996283c603fbafa802",
+                "summary": "Delete a role",
+                "description": "Remove a role from the system",
+                "operationId": "05affe96054c3b8f28d18b3a3d24e839",
                 "parameters": [
                     {
-                        "name": "roleId",
+                        "name": "id",
                         "in": "path",
+                        "description": "Role ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "permissionId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "Permission revoked"
+                    "200": {
+                        "description": "Role deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rol eliminado correctamente."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Role or permission not found"
+                        "description": "Role not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al eliminar el rol."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/roles/dropdown": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Get roles for dropdown",
+                "description": "Retrieve all roles formatted for dropdown/select components",
+                "operationId": "edadc917c68b0326d3b14e0bb7e47a22",
+                "responses": {
+                    "200": {
+                        "description": "List of roles for dropdown retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los roles."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -352,23 +1082,77 @@
                     "Users"
                 ],
                 "summary": "Get all users",
+                "description": "Retrieve a list of all users with their assigned roles",
                 "operationId": "b30dc2968e9afb4993b997b6f4833718",
                 "responses": {
                     "200": {
-                        "description": "List of users",
+                        "description": "List of users retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/User"
-                                    }
+                                    "properties": {
+                                        "users": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "John Doe"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "format": "email",
+                                                        "example": "john@example.com"
+                                                    },
+                                                    "email_verified_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "roles_list": {
+                                                        "type": "string",
+                                                        "example": "Admin, Editor"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los usuarios."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -382,8 +1166,10 @@
                     "Users"
                 ],
                 "summary": "Create a new user",
+                "description": "Create a new user with optional role assignments",
                 "operationId": "d9b614bef6deb4083d7160d565a3c505",
                 "requestBody": {
+                    "description": "User data",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -395,15 +1181,29 @@
                                 ],
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "description": "User's full name (max 255 characters)",
+                                        "type": "string",
+                                        "example": "John Doe"
                                     },
                                     "email": {
+                                        "description": "User's email address (must be unique, max 255 characters)",
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "john@example.com"
                                     },
                                     "password": {
+                                        "description": "User's password (minimum 8 characters)",
                                         "type": "string",
-                                        "format": "password"
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "roles": {
+                                        "description": "Array of role IDs to assign to the user",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -413,20 +1213,85 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "User created",
+                        "description": "User created successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "john@example.com"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The email has already been taken."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al crear el usuario."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -442,33 +1307,114 @@
                     "Users"
                 ],
                 "summary": "Get a user by ID",
+                "description": "Retrieve a single user with their assigned roles",
                 "operationId": "6fb5fdcad7cbe56a440b61a3199ba661",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "User ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "User found",
+                        "description": "User retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "john@example.com"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "roles_list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "value": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "label": {
+                                                                "type": "string",
+                                                                "example": "Admin"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "User not found"
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener el usuario."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -482,33 +1428,51 @@
                     "Users"
                 ],
                 "summary": "Update a user",
+                "description": "Update an existing user's information and/or role assignments",
                 "operationId": "fcbb6e9607caa5bd628196124be1a8a6",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "User ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "requestBody": {
+                    "description": "User data to update (all fields are optional)",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
                                     "name": {
-                                        "type": "string"
+                                        "description": "User's full name (max 255 characters)",
+                                        "type": "string",
+                                        "example": "Jane Doe"
                                     },
                                     "email": {
+                                        "description": "User's email address (must be unique, max 255 characters)",
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "jane@example.com"
                                     },
                                     "password": {
+                                        "description": "User's new password (minimum 8 characters)",
                                         "type": "string",
-                                        "format": "password"
+                                        "format": "password",
+                                        "example": "newpassword123"
+                                    },
+                                    "roles": {
+                                        "description": "Array of role IDs to sync with the user",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 1
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -518,23 +1482,101 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User updated",
+                        "description": "User updated successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/User"
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Jane Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "jane@example.com"
+                                                },
+                                                "email_verified_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Validation error"
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The email has already been taken."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "User not found"
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al actualizar el usuario."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -548,72 +1590,71 @@
                     "Users"
                 ],
                 "summary": "Delete a user",
+                "description": "Remove a user from the system",
                 "operationId": "289822e351ea9e4cd69a686cc18fa74c",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "User ID",
                         "required": true,
                         "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "User deleted"
-                    },
-                    "404": {
-                        "description": "User not found"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/auth/users/{id}/roles": {
-            "get": {
-                "tags": [
-                    "Users",
-                    "Roles"
-                ],
-                "summary": "Get roles for a user",
-                "operationId": "ce53efc4390e73b3c83eb2ec734c89ee",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                            "type": "integer",
+                            "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "User roles",
+                        "description": "User deleted successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Role"
-                                    }
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario eliminado correctamente."
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "User not found"
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Unauthorized"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al eliminar el usuario."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -623,129 +1664,56 @@
                 ]
             }
         },
-        "/api/auth/users/{id}/permissions": {
+        "/api/auth/users/dropdown": {
             "get": {
                 "tags": [
-                    "Users",
-                    "Permissions"
+                    "Users"
                 ],
-                "summary": "Get permissions for a user",
-                "operationId": "935b4357e3356a74e8f17c9f6b27b4f1",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
+                "summary": "Get users for dropdown",
+                "description": "Retrieve all users formatted for dropdown/select components",
+                "operationId": "e73b66f29c605d281b73fdb191b185f9",
                 "responses": {
                     "200": {
-                        "description": "User permissions",
+                        "description": "List of users for dropdown retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/Permission"
+                                        "properties": {
+                                            "value": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "label": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            }
+                                        },
+                                        "type": "object"
                                     }
                                 }
                             }
                         }
                     },
-                    "404": {
-                        "description": "User not found"
-                    },
                     "401": {
-                        "description": "Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/auth/users/{userId}/permissions/{permissionId}": {
-            "post": {
-                "tags": [
-                    "Users",
-                    "Permissions"
-                ],
-                "summary": "Assign a permission to a user",
-                "operationId": "e500c854a99ce439c696819702173741",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los usuarios."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
                         }
-                    },
-                    {
-                        "name": "permissionId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Permission assigned"
-                    },
-                    "404": {
-                        "description": "User or permission not found"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            },
-            "delete": {
-                "tags": [
-                    "Users",
-                    "Permissions"
-                ],
-                "summary": "Revoke a permission from a user",
-                "operationId": "c1d0677fafc82d94151babfefeabaf44",
-                "parameters": [
-                    {
-                        "name": "userId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "permissionId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Permission revoked"
-                    },
-                    "404": {
-                        "description": "User or permission not found"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     }
                 },
                 "security": [
@@ -773,17 +1741,17 @@
                         "format": "email",
                         "example": "jane@example.com"
                     },
-                    "roles": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
+                    "roles_list": {
+                        "type": "string",
+                        "example": "admin, editor"
                     },
-                    "permissions": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -797,6 +1765,18 @@
                     "name": {
                         "type": "string",
                         "example": "admin"
+                    },
+                    "permissions_list": {
+                        "type": "string",
+                        "example": "users.create, users.edit"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -810,6 +1790,31 @@
                     "name": {
                         "type": "string",
                         "example": "users.create"
+                    },
+                    "roles_list": {
+                        "type": "string",
+                        "example": "admin, editor"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Dropdown": {
+                "properties": {
+                    "value": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Jane Doe"
                     }
                 },
                 "type": "object"
