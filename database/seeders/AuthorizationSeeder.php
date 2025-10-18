@@ -15,8 +15,8 @@ class AuthorizationSeeder extends Seeder
         // Create 500 permissions
         $permissions = \Database\Factories\PermissionFactory::new()->count(500)->create();
 
-        // Create 500 roles
-        $roles = \Database\Factories\RoleFactory::new()->count(500)->create();
+        // Create 100 roles
+        $roles = \Database\Factories\RoleFactory::new()->count(100)->create();
 
         // Assign random permissions to each role
         foreach ($roles as $role) {
@@ -24,12 +24,12 @@ class AuthorizationSeeder extends Seeder
             $role->syncPermissions($randomPermissions);
         }
 
-        // Create 500 users
-        $users = \App\Models\User::factory(500)->create();
+        // Create 10 users (smaller number for local/dev)
+        $users = \App\Models\User::factory(10)->create();
 
-        // Assign random roles to each user
+        // Assign random roles (1-5) to each user
         foreach ($users as $user) {
-            $randomRoles = $roles->random(rand(1, 10));
+            $randomRoles = $roles->random(rand(1, 5));
             $user->syncRoles($randomRoles);
         }
     }

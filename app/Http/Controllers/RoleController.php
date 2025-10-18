@@ -22,15 +22,17 @@ class RoleController extends Controller
      *         description="List of roles retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="array",
      *
-     *             @OA\Property(property="roles", type="array", @OA\Items(
+     *             @OA\Items(
+     *
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="Admin"),
      *                 @OA\Property(property="guard_name", type="string", example="web"),
      *                 @OA\Property(property="permissions_list", type="string", example="edit-posts, delete-posts"),
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             ))
+     *             )
      *         )
      *     ),
      *
@@ -50,12 +52,17 @@ class RoleController extends Controller
     {
         try {
             $roles = Role::with('permissions')->get()->map(function ($role) {
-                $role->permissions_list = $role->permissions->pluck('name')->implode(', ');
+                $permissionsList = $role->permissions->pluck('name')->implode(', ');
 
-                return $role;
+                $item = $role->toArray();
+                $item['permissions_list'] = $permissionsList;
+                // remove relation data to avoid exposing pivot tables
+                unset($item['permissions']);
+
+                return $item;
             });
 
-            return response()->json(['roles' => $roles], 200);
+            return response()->json($roles, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching roles: '.$e->getMessage(), ['exception' => $e]);
 
@@ -99,14 +106,13 @@ class RoleController extends Controller
      *         description="Role created successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="role", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Editor"),
-     *                 @OA\Property(property="guard_name", type="string", example="web"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Editor"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -148,7 +154,14 @@ class RoleController extends Controller
                 $role->givePermissionTo(Permission::whereIn('id', $validated['permissions'])->get());
             }
 
-            return response()->json(['role' => $role], 201);
+            $role->refresh();
+            $permissionsList = $role->permissions->pluck('name')->implode(', ');
+
+            $item = $role->toArray();
+            $item['permissions_list'] = $permissionsList;
+            unset($item['permissions']);
+
+            return response()->json($item, 201);
         } catch (\Exception $e) {
             Log::error('Error creating role: '.$e->getMessage(), ['exception' => $e]);
 
@@ -178,18 +191,17 @@ class RoleController extends Controller
      *         description="Role retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="role", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Admin"),
-     *                 @OA\Property(property="guard_name", type="string", example="web"),
-     *                 @OA\Property(property="permissions_list", type="array", @OA\Items(
-     *                     @OA\Property(property="value", type="integer", example=1),
-     *                     @OA\Property(property="label", type="string", example="edit-posts")
-     *                 )),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Admin"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="permissions_list", type="array", @OA\Items(
+     *                 @OA\Property(property="value", type="integer", example=1),
+     *                 @OA\Property(property="label", type="string", example="edit-posts")
+     *             )),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -222,11 +234,15 @@ class RoleController extends Controller
             if (! $role) {
                 return response()->json(['error' => 'Rol no encontrado.'], 404);
             }
-            $role->permissions_list = $role->permissions->map(function ($permission) {
+            $permissionsList = $role->permissions->map(function ($permission) {
                 return ['value' => $permission->id, 'label' => $permission->name];
             });
 
-            return response()->json(['role' => $role], 200);
+            $item = $role->toArray();
+            $item['permissions_list'] = $permissionsList;
+            unset($item['permissions']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching role: '.$e->getMessage(), ['exception' => $e]);
 
@@ -278,14 +294,13 @@ class RoleController extends Controller
      *         description="Role updated successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="role", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Super Admin"),
-     *                 @OA\Property(property="guard_name", type="string", example="web"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Super Admin"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -343,7 +358,14 @@ class RoleController extends Controller
                 $role->syncPermissions(Permission::whereIn('id', $validated['permissions'])->get());
             }
 
-            return response()->json(['role' => $role], 200);
+            $role->refresh();
+            $permissionsList = $role->permissions->pluck('name')->implode(', ');
+
+            $item = $role->toArray();
+            $item['permissions_list'] = $permissionsList;
+            unset($item['permissions']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error updating role: '.$e->getMessage(), ['exception' => $e]);
 

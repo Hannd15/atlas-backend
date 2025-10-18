@@ -21,15 +21,17 @@ class PermissionController extends Controller
      *         description="List of permissions retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="array",
      *
-     *             @OA\Property(property="permissions", type="array", @OA\Items(
+     *             @OA\Items(
+     *
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="edit-posts"),
      *                 @OA\Property(property="guard_name", type="string", example="web"),
      *                 @OA\Property(property="roles_list", type="string", example="Admin, Editor"),
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             ))
+     *             )
      *         )
      *     ),
      *
@@ -51,10 +53,14 @@ class PermissionController extends Controller
             $permissions = Permission::with('roles')->get()->map(function ($permission) {
                 $permission->roles_list = $permission->roles->pluck('name')->implode(', ');
 
-                return $permission;
+                $item = $permission->toArray();
+                // remove relation data to avoid exposing pivot tables
+                unset($item['roles']);
+
+                return $item;
             });
 
-            return response()->json(['permissions' => $permissions], 200);
+            return response()->json($permissions, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching permissions: '.$e->getMessage(), ['exception' => $e]);
 
@@ -84,18 +90,17 @@ class PermissionController extends Controller
      *         description="Permission retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="permission", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="edit-posts"),
-     *                 @OA\Property(property="guard_name", type="string", example="web"),
-     *                 @OA\Property(property="roles_list", type="array", @OA\Items(
-     *                     @OA\Property(property="value", type="integer", example=1),
-     *                     @OA\Property(property="label", type="string", example="Admin")
-     *                 )),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="edit-posts"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="roles_list", type="array", @OA\Items(
+     *                 @OA\Property(property="value", type="integer", example=1),
+     *                 @OA\Property(property="label", type="string", example="Admin")
+     *             )),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -132,7 +137,10 @@ class PermissionController extends Controller
                 return ['value' => $role->id, 'label' => $role->name];
             });
 
-            return response()->json(['permission' => $permission], 200);
+            $item = $permission->toArray();
+            unset($item['roles']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching permission: '.$e->getMessage(), ['exception' => $e]);
 
@@ -178,14 +186,13 @@ class PermissionController extends Controller
      *         description="Permission updated successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="permission", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="edit-posts"),
-     *                 @OA\Property(property="guard_name", type="string", example="web"),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="edit-posts"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -236,7 +243,11 @@ class PermissionController extends Controller
 
             $permission->update(['name' => $validated['name']]);
 
-            return response()->json(['permission' => $permission], 200);
+            $permission->refresh();
+            $item = $permission->toArray();
+            unset($item['roles']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error updating permission: '.$e->getMessage(), ['exception' => $e]);
 

@@ -20,41 +20,36 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "permissions": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "edit-posts"
-                                                    },
-                                                    "guard_name": {
-                                                        "type": "string",
-                                                        "example": "web"
-                                                    },
-                                                    "roles_list": {
-                                                        "type": "string",
-                                                        "example": "Admin, Editor"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "edit-posts"
+                                            },
+                                            "guard_name": {
+                                                "type": "string",
+                                                "example": "web"
+                                            },
+                                            "roles_list": {
+                                                "type": "string",
+                                                "example": "Admin, Editor"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
                                             }
-                                        }
-                                    },
-                                    "type": "object"
+                                        },
+                                        "type": "object"
+                                    }
                                 }
                             }
                         }
@@ -113,46 +108,41 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "permission": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "edit-posts"
-                                                },
-                                                "guard_name": {
-                                                    "type": "string",
-                                                    "example": "web"
-                                                },
-                                                "roles_list": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "value": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "label": {
-                                                                "type": "string",
-                                                                "example": "Admin"
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "edit-posts"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "roles_list": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "Admin"
                                                     }
                                                 },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                                "type": "object"
+                                            }
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -249,30 +239,25 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "permission": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "edit-posts"
-                                                },
-                                                "guard_name": {
-                                                    "type": "string",
-                                                    "example": "web"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "edit-posts"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -493,41 +478,36 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "roles": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "Admin"
-                                                    },
-                                                    "guard_name": {
-                                                        "type": "string",
-                                                        "example": "web"
-                                                    },
-                                                    "permissions_list": {
-                                                        "type": "string",
-                                                        "example": "edit-posts, delete-posts"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Admin"
+                                            },
+                                            "guard_name": {
+                                                "type": "string",
+                                                "example": "web"
+                                            },
+                                            "permissions_list": {
+                                                "type": "string",
+                                                "example": "edit-posts, delete-posts"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
                                             }
-                                        }
-                                    },
-                                    "type": "object"
+                                        },
+                                        "type": "object"
+                                    }
                                 }
                             }
                         }
@@ -601,30 +581,25 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "role": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Editor"
-                                                },
-                                                "guard_name": {
-                                                    "type": "string",
-                                                    "example": "web"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Editor"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -705,46 +680,41 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "role": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Admin"
-                                                },
-                                                "guard_name": {
-                                                    "type": "string",
-                                                    "example": "web"
-                                                },
-                                                "permissions_list": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "value": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "label": {
-                                                                "type": "string",
-                                                                "example": "edit-posts"
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Admin"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "permissions_list": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "edit-posts"
                                                     }
                                                 },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                                "type": "object"
+                                            }
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -846,30 +816,25 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "role": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Super Admin"
-                                                },
-                                                "guard_name": {
-                                                    "type": "string",
-                                                    "example": "web"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Super Admin"
+                                        },
+                                        "guard_name": {
+                                            "type": "string",
+                                            "example": "web"
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -1090,47 +1055,42 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "users": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "name": {
-                                                        "type": "string",
-                                                        "example": "John Doe"
-                                                    },
-                                                    "email": {
-                                                        "type": "string",
-                                                        "format": "email",
-                                                        "example": "john@example.com"
-                                                    },
-                                                    "email_verified_at": {
-                                                        "type": "string",
-                                                        "format": "date-time",
-                                                        "nullable": true
-                                                    },
-                                                    "roles_list": {
-                                                        "type": "string",
-                                                        "example": "Admin, Editor"
-                                                    },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
-                                                },
-                                                "type": "object"
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "john@example.com"
+                                            },
+                                            "email_verified_at": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "nullable": true
+                                            },
+                                            "roles_list": {
+                                                "type": "string",
+                                                "example": "Admin, Editor"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
                                             }
-                                        }
-                                    },
-                                    "type": "object"
+                                        },
+                                        "type": "object"
+                                    }
                                 }
                             }
                         }
@@ -1218,36 +1178,31 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "John Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "john@example.com"
-                                                },
-                                                "email_verified_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "john@example.com"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -1328,52 +1283,47 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "John Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "john@example.com"
-                                                },
-                                                "email_verified_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                },
-                                                "roles_list": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "value": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "label": {
-                                                                "type": "string",
-                                                                "example": "Admin"
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "john@example.com"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true
+                                        },
+                                        "roles_list": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "label": {
+                                                        "type": "string",
+                                                        "example": "Admin"
                                                     }
                                                 },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                                "type": "object"
+                                            }
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"
@@ -1487,36 +1437,31 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "user": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Jane Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "format": "email",
-                                                    "example": "jane@example.com"
-                                                },
-                                                "email_verified_at": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "nullable": true
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Jane Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "jane@example.com"
+                                        },
+                                        "email_verified_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "nullable": true
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
                                         }
                                     },
                                     "type": "object"

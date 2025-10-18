@@ -22,8 +22,10 @@ class UserController extends Controller
      *         description="List of users retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="array",
      *
-     *             @OA\Property(property="users", type="array", @OA\Items(
+     *             @OA\Items(
+     *
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="John Doe"),
      *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
@@ -31,7 +33,7 @@ class UserController extends Controller
      *                 @OA\Property(property="roles_list", type="string", example="Admin, Editor"),
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             ))
+     *             )
      *         )
      *     ),
      *
@@ -51,14 +53,50 @@ class UserController extends Controller
     {
         try {
             $users = User::with('roles')->get()->map(function ($user) {
-                $user->roles_list = $user->roles->pluck('name')->implode(', ');
+                $rolesList = $user->roles->pluck('name')->implode(', ');
 
-                return $user;
+                $item = $user->toArray();
+                $item['roles_list'] = $rolesList;
+                // remove relation data to avoid exposing pivot tables
+                unset($item['roles']);
+
+                return $item;
             });
 
-            return response()->json(['users' => $users], 200);
+            return response()->json($users, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching users: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
+        }
+    }
+
+    /**
+     * Paginate users
+     *
+     * Accepts query params: page, per_page
+     */
+    public function paginate(Request $request)
+    {
+        try {
+            $perPage = (int) $request->query('per_page', 15);
+            $perPage = $perPage > 0 ? $perPage : 15;
+
+            $paginator = User::with('roles')->paginate($perPage);
+
+            $paginator->getCollection()->transform(function ($user) {
+                $rolesList = $user->roles->pluck('name')->implode(', ');
+
+                $item = $user->toArray();
+                $item['roles_list'] = $rolesList;
+                unset($item['roles']);
+
+                return $item;
+            });
+
+            return response()->json($paginator, 200);
+        } catch (\Exception $e) {
+            Log::error('Error paginating users: '.$e->getMessage(), ['exception' => $e]);
 
             return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
         }
@@ -114,15 +152,14 @@ class UserController extends Controller
      *         description="User created successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="user", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -166,7 +203,14 @@ class UserController extends Controller
                 $user->assignRole(Role::whereIn('id', $validated['roles'])->get());
             }
 
-            return response()->json(['user' => $user], 201);
+            $user->refresh();
+            $rolesList = $user->roles->pluck('name')->implode(', ');
+
+            $item = $user->toArray();
+            $item['roles_list'] = $rolesList;
+            unset($item['roles']);
+
+            return response()->json($item, 201);
         } catch (\Exception $e) {
             Log::error('Error creating user: '.$e->getMessage(), ['exception' => $e]);
 
@@ -196,19 +240,18 @@ class UserController extends Controller
      *         description="User retrieved successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="user", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="John Doe"),
-     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
-     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
-     *                 @OA\Property(property="roles_list", type="array", @OA\Items(
-     *                     @OA\Property(property="value", type="integer", example=1),
-     *                     @OA\Property(property="label", type="string", example="Admin")
-     *                 )),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="roles_list", type="array", @OA\Items(
+     *                 @OA\Property(property="value", type="integer", example=1),
+     *                 @OA\Property(property="label", type="string", example="Admin")
+     *             )),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -241,11 +284,15 @@ class UserController extends Controller
             if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
-            $user->roles_list = $user->roles->map(function ($role) {
+            $rolesList = $user->roles->map(function ($role) {
                 return ['value' => $role->id, 'label' => $role->name];
             });
 
-            return response()->json(['user' => $user], 200);
+            $item = $user->toArray();
+            $item['roles_list'] = $rolesList;
+            unset($item['roles']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching user: '.$e->getMessage(), ['exception' => $e]);
 
@@ -311,15 +358,14 @@ class UserController extends Controller
      *         description="User updated successfully",
      *
      *         @OA\JsonContent(
+     *             type="object",
      *
-     *             @OA\Property(property="user", type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="name", type="string", example="Jane Doe"),
-     *                 @OA\Property(property="email", type="string", format="email", example="jane@example.com"),
-     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
-     *                 @OA\Property(property="created_at", type="string", format="date-time"),
-     *                 @OA\Property(property="updated_at", type="string", format="date-time")
-     *             )
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Jane Doe"),
+     *             @OA\Property(property="email", type="string", format="email", example="jane@example.com"),
+     *             @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
      *     ),
      *
@@ -379,7 +425,14 @@ class UserController extends Controller
                 $user->syncRoles(Role::whereIn('id', $validated['roles'])->get());
             }
 
-            return response()->json(['user' => $user], 200);
+            $user->refresh();
+            $rolesList = $user->roles->pluck('name')->implode(', ');
+
+            $item = $user->toArray();
+            $item['roles_list'] = $rolesList;
+            unset($item['roles']);
+
+            return response()->json($item, 200);
         } catch (\Exception $e) {
             Log::error('Error updating user: '.$e->getMessage(), ['exception' => $e]);
 
