@@ -69,6 +69,89 @@ class PermissionController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *     path="/api/auth/permissions",
+     *     summary="Create a new permission",
+     *     description="Create a new permission",
+     *     tags={"Permissions"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Permission data",
+     *
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *
+     *             @OA\Property(
+     *                 property="name",
+     *                 type="string",
+     *                 description="Permission name (must be unique, max 255 characters)",
+     *                 example="edit-posts"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Permission created successfully",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="edit-posts"),
+     *             @OA\Property(property="guard_name", type="string", example="web"),
+     *             @OA\Property(property="created_at", type="string", format="date-time"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Validation error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="The name field is required."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al crear el permiso.")
+     *         )
+     *     )
+     * )
+     */
+    public function store(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255|unique:permissions,name',
+            ]);
+
+            $permission = Permission::create(['name' => $validated['name'], 'guard_name' => 'web']);
+
+            $permission->refresh();
+            $item = $permission->toArray();
+            unset($item['roles']);
+
+            return response()->json($item, 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating permission: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al crear el permiso.'], 500);
+        }
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/auth/permissions/{id}",
      *     summary="Get a permission by ID",

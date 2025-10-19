@@ -72,37 +72,6 @@ class UserController extends Controller
     }
 
     /**
-     * Paginate users
-     *
-     * Accepts query params: page, per_page
-     */
-    public function paginate(Request $request)
-    {
-        try {
-            $perPage = (int) $request->query('per_page', 15);
-            $perPage = $perPage > 0 ? $perPage : 15;
-
-            $paginator = User::with('roles')->paginate($perPage);
-
-            $paginator->getCollection()->transform(function ($user) {
-                $rolesList = $user->roles->pluck('name')->implode(', ');
-
-                $item = $user->toArray();
-                $item['roles_list'] = $rolesList;
-                unset($item['roles']);
-
-                return $item;
-            });
-
-            return response()->json($paginator, 200);
-        } catch (\Exception $e) {
-            Log::error('Error paginating users: '.$e->getMessage(), ['exception' => $e]);
-
-            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
-        }
-    }
-
-    /**
      * @OA\Post(
      *     path="/api/auth/users",
      *     summary="Create a new user",
