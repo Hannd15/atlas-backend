@@ -182,7 +182,7 @@ class PermissionController extends Controller
      *                 property="roles_list",
      *                 type="array",
      *
-     *                 @OA\Items(type="string", example="1")
+     *                 @OA\Items(type="integer", example=1)
      *             ),
      *
      *             @OA\Property(property="created_at", type="string", format="date-time"),
@@ -219,7 +219,7 @@ class PermissionController extends Controller
             if (! $permission) {
                 return response()->json(['error' => 'Permiso no encontrado.'], 404);
             }
-            $permission->roles_list = $permission->roles->pluck('id')->map(fn ($id) => (string) $id);
+            $permission->roles_list = $permission->roles->pluck('id')->map(fn ($id) => (int) $id);
 
             $item = $permission->toArray();
             unset($item['roles']);

@@ -229,17 +229,8 @@
                                         "roles_list": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "value": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "label": {
-                                                        "type": "string",
-                                                        "example": "Admin"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "type": "integer",
+                                                "example": 1
                                             }
                                         },
                                         "created_at": {
@@ -801,17 +792,8 @@
                                         "permissions_list": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "value": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "label": {
-                                                        "type": "string",
-                                                        "example": "edit-posts"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "type": "integer",
+                                                "example": 1
                                             }
                                         },
                                         "created_at": {
@@ -1410,17 +1392,8 @@
                                         "roles_list": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "value": {
-                                                        "type": "integer",
-                                                        "example": 1
-                                                    },
-                                                    "label": {
-                                                        "type": "string",
-                                                        "example": "Admin"
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "type": "integer",
+                                                "example": 1
                                             }
                                         },
                                         "created_at": {

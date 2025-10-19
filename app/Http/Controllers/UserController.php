@@ -219,7 +219,7 @@ class UserController extends Controller
      *                 property="roles_list",
      *                 type="array",
      *
-     *                 @OA\Items(type="string", example="1")
+     *                 @OA\Items(type="integer", example=1)
      *             ),
      *
      *             @OA\Property(property="created_at", type="string", format="date-time"),
@@ -256,7 +256,7 @@ class UserController extends Controller
             if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
-            $rolesList = $user->roles->pluck('id')->map(fn ($id) => (string) $id);
+            $rolesList = $user->roles->pluck('id')->map(fn ($id) => (int) $id);
 
             $item = $user->toArray();
             $item['roles_list'] = $rolesList;
