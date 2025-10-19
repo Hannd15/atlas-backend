@@ -100,13 +100,6 @@ class UserController extends Controller
      *                 example="john@example.com"
      *             ),
      *             @OA\Property(
-     *                 property="password",
-     *                 type="string",
-     *                 format="password",
-     *                 description="User's password (minimum 8 characters)",
-     *                 example="password123"
-     *             ),
-     *             @OA\Property(
      *                 property="roles",
      *                 type="array",
      *                 description="Array of role IDs to assign to the user",
@@ -161,7 +154,6 @@ class UserController extends Controller
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:8',
                 'roles' => 'nullable|array',
                 'roles.*' => 'integer|exists:roles,id',
             ]);
