@@ -196,10 +196,13 @@ class RoleController extends Controller
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="Admin"),
      *             @OA\Property(property="guard_name", type="string", example="web"),
-     *             @OA\Property(property="permissions_list", type="array", @OA\Items(
-     *                 @OA\Property(property="value", type="integer", example=1),
-     *                 @OA\Property(property="label", type="string", example="edit-posts")
-     *             )),
+     *             @OA\Property(
+     *                 property="permissions_list",
+     *                 type="array",
+     *
+     *                 @OA\Items(type="string", example="1")
+     *             ),
+     *
      *             @OA\Property(property="created_at", type="string", format="date-time"),
      *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
@@ -234,9 +237,7 @@ class RoleController extends Controller
             if (! $role) {
                 return response()->json(['error' => 'Rol no encontrado.'], 404);
             }
-            $permissionsList = $role->permissions->map(function ($permission) {
-                return ['value' => $permission->id, 'label' => $permission->name];
-            });
+            $permissionsList = $role->permissions->pluck('id')->map(fn ($id) => (string) $id);
 
             $item = $role->toArray();
             $item['permissions_list'] = $permissionsList;

@@ -215,10 +215,13 @@ class UserController extends Controller
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
      *             @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
-     *             @OA\Property(property="roles_list", type="array", @OA\Items(
-     *                 @OA\Property(property="value", type="integer", example=1),
-     *                 @OA\Property(property="label", type="string", example="Admin")
-     *             )),
+     *             @OA\Property(
+     *                 property="roles_list",
+     *                 type="array",
+     *
+     *                 @OA\Items(type="string", example="1")
+     *             ),
+     *
      *             @OA\Property(property="created_at", type="string", format="date-time"),
      *             @OA\Property(property="updated_at", type="string", format="date-time")
      *         )
@@ -253,9 +256,7 @@ class UserController extends Controller
             if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
-            $rolesList = $user->roles->map(function ($role) {
-                return ['value' => $role->id, 'label' => $role->name];
-            });
+            $rolesList = $user->roles->pluck('id')->map(fn ($id) => (string) $id);
 
             $item = $user->toArray();
             $item['roles_list'] = $rolesList;
