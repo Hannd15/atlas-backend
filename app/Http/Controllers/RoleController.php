@@ -51,16 +51,19 @@ class RoleController extends Controller
     public function index()
     {
         try {
-            $roles = Role::with('permissions')->get()->map(function ($role) {
-                $permissionsList = $role->permissions->pluck('name')->implode(', ');
+            $roles = Role::with('permissions')
+                ->orderByDesc('updated_at')
+                ->get()
+                ->map(function ($role) {
+                    $permissionsList = $role->permissions->pluck('name')->implode(', ');
 
-                $item = $role->toArray();
-                $item['permissions_list'] = $permissionsList;
-                // remove relation data to avoid exposing pivot tables
-                unset($item['permissions']);
+                    $item = $role->toArray();
+                    $item['permissions_list'] = $permissionsList;
+                    // remove relation data to avoid exposing pivot tables
+                    unset($item['permissions']);
 
-                return $item;
-            });
+                    return $item;
+                });
 
             return response()->json($roles, 200);
         } catch (\Exception $e) {

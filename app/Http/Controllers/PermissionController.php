@@ -50,15 +50,18 @@ class PermissionController extends Controller
     public function index()
     {
         try {
-            $permissions = Permission::with('roles')->get()->map(function ($permission) {
-                $permission->roles_list = $permission->roles->pluck('name')->implode(', ');
+            $permissions = Permission::with('roles')
+                ->orderByDesc('updated_at')
+                ->get()
+                ->map(function ($permission) {
+                    $permission->roles_list = $permission->roles->pluck('name')->implode(', ');
 
-                $item = $permission->toArray();
-                // remove relation data to avoid exposing pivot tables
-                unset($item['roles']);
+                    $item = $permission->toArray();
+                    // remove relation data to avoid exposing pivot tables
+                    unset($item['roles']);
 
-                return $item;
-            });
+                    return $item;
+                });
 
             return response()->json($permissions, 200);
         } catch (\Exception $e) {

@@ -52,16 +52,19 @@ class UserController extends Controller
     public function index()
     {
         try {
-            $users = User::with('roles')->get()->map(function ($user) {
-                $rolesList = $user->roles->pluck('name')->implode(', ');
+            $users = User::with('roles')
+                ->orderByDesc('updated_at')
+                ->get()
+                ->map(function ($user) {
+                    $rolesList = $user->roles->pluck('name')->implode(', ');
 
-                $item = $user->toArray();
-                $item['roles_list'] = $rolesList;
-                // remove relation data to avoid exposing pivot tables
-                unset($item['roles']);
+                    $item = $user->toArray();
+                    $item['roles_list'] = $rolesList;
+                    // remove relation data to avoid exposing pivot tables
+                    unset($item['roles']);
 
-                return $item;
-            });
+                    return $item;
+                });
 
             return response()->json($users, 200);
         } catch (\Exception $e) {
