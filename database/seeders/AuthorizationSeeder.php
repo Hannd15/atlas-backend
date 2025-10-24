@@ -13,14 +13,14 @@ class AuthorizationSeeder extends Seeder
     public function run(): void
     {
         // Create 500 permissions
-        $permissions = \Database\Factories\PermissionFactory::new()->count(500)->create();
+        $permissions = \Database\Factories\PermissionFactory::new()->count(50)->create();
 
         // Create 100 roles
-        $roles = \Database\Factories\RoleFactory::new()->count(100)->create();
+        $roles = \Database\Factories\RoleFactory::new()->count(10)->create();
 
         // Assign random permissions to each role
         foreach ($roles as $role) {
-            $randomPermissions = $permissions->random(rand(10, 50));
+            $randomPermissions = $permissions->random(rand(1, 10));
             $role->syncPermissions($randomPermissions);
         }
 

@@ -23,9 +23,13 @@ class RoleFactory extends Factory
      */
     public function definition(): array
     {
-        // Use UUIDs to ensure uniqueness for large generation counts
+        // Deterministic numeric naming pattern to avoid collisions and
+        // provide predictable values for seeds and tests. Produces
+        // role-1, role-2, ... per PHP process execution.
+        static $counter = 1;
+
         return [
-            'name' => 'role-'.fake()->uuid(),
+            'name' => 'role-'.$counter++,
             'guard_name' => 'web',
         ];
     }

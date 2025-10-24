@@ -23,9 +23,13 @@ class PermissionFactory extends Factory
      */
     public function definition(): array
     {
-        // Use a UUID to guarantee uniqueness even for large seed counts
+        // Deterministic numeric naming pattern to avoid collisions and
+        // provide predictable values for seeds and tests. Produces
+        // permission-1, permission-2, ... per PHP process execution.
+        static $counter = 1;
+
         return [
-            'name' => 'permission-'.fake()->uuid(),
+            'name' => 'permission-'.$counter++,
             'guard_name' => 'web',
         ];
     }
