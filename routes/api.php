@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TokenVerificationController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/auth')->group(function () {
+    Route::post('/token/verify', [TokenVerificationController::class, 'verify']);
+
     // User routes
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
@@ -32,4 +35,4 @@ Route::prefix('/auth')->group(function () {
     Route::put('/permissions/{id}', [PermissionController::class, 'update']);
     Route::delete('/permissions/{id}', [PermissionController::class, 'destroy']);
 });
-});
+// });
