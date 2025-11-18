@@ -6,6 +6,147 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/auth/google/meet/create": {
+            "post": {
+                "tags": [
+                    "Google Meet"
+                ],
+                "summary": "Create a Google Meet meeting on behalf of the authenticated user",
+                "description": "Creates a Calendar event with Google Meet conferencing. Requires the user to have authorized Calendar + Meet scopes.",
+                "operationId": "2daec9db653dd2323f00ba63850399dd",
+                "requestBody": {
+                    "description": "Meeting details",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "summary",
+                                    "start",
+                                    "end"
+                                ],
+                                "properties": {
+                                    "summary": {
+                                        "description": "Meeting title",
+                                        "type": "string",
+                                        "example": "Team Standup"
+                                    },
+                                    "description": {
+                                        "description": "Meeting description",
+                                        "type": "string",
+                                        "example": "Daily standup meeting"
+                                    },
+                                    "start": {
+                                        "description": "Start time",
+                                        "properties": {
+                                            "dateTime": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-11-20T10:00:00-05:00"
+                                            },
+                                            "timeZone": {
+                                                "type": "string",
+                                                "example": "America/New_York"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "end": {
+                                        "description": "End time",
+                                        "properties": {
+                                            "dateTime": {
+                                                "type": "string",
+                                                "format": "date-time",
+                                                "example": "2025-11-20T11:00:00-05:00"
+                                            },
+                                            "timeZone": {
+                                                "type": "string",
+                                                "example": "America/New_York"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "attendees": {
+                                        "description": "Optional list of attendees",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "attendee@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Meeting created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "example": "abc123def456"
+                                        },
+                                        "summary": {
+                                            "type": "string",
+                                            "example": "Team Standup"
+                                        },
+                                        "hangoutLink": {
+                                            "type": "string",
+                                            "example": "https://meet.google.com/abc-defg-hij"
+                                        },
+                                        "htmlLink": {
+                                            "type": "string",
+                                            "example": "https://www.google.com/calendar/event?eid=..."
+                                        },
+                                        "conferenceData": {
+                                            "properties": {
+                                                "entryPoints": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "entryPointType": {
+                                                                "type": "string",
+                                                                "example": "video"
+                                                            },
+                                                            "uri": {
+                                                                "type": "string",
+                                                                "example": "https://meet.google.com/abc-defg-hij"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated or no Google tokens"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/api/auth/permissions": {
             "get": {
                 "tags": [
@@ -1129,6 +1270,175 @@
                 ]
             }
         },
+        "/api/auth/token/verify": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify bearer token and optional authorization requirements",
+                "description": "Validates a Sanctum bearer token and confirms whether the associated user meets the provided role and/or permission requirements.",
+                "operationId": "dc9a796c3d89395b4d653f1de9c2640a",
+                "requestBody": {
+                    "description": "Optional role and permission requirements to evaluate against the authenticated user.",
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "roles": {
+                                        "description": "Array of role names that the user must have (all must be satisfied).",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "admin"
+                                        }
+                                    },
+                                    "permissions": {
+                                        "description": "Array of permission names that the user must have (all must be satisfied).",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "edit-users"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token is valid and requirements satisfied.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "authorized": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "María Pérez"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "maria@example.com"
+                                                },
+                                                "roles_list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "7"
+                                                    }
+                                                },
+                                                "permissions_list": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "12"
+                                                    }
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "properties": {
+                                                "abilities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "*"
+                                                    }
+                                                },
+                                                "expires_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token missing, invalid, or expired.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "authorized": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Token inválido o expirado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Token valid but user lacks required roles or permissions.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "authorized": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "El usuario no cumple con los requisitos de autorización."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error in provided roles or permissions.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The roles.0 field must exist in roles."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/users": {
             "get": {
                 "tags": [
@@ -1238,12 +1548,6 @@
                                         "type": "string",
                                         "format": "email",
                                         "example": "john@example.com"
-                                    },
-                                    "password": {
-                                        "description": "User's password (minimum 8 characters)",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "password123"
                                     },
                                     "roles": {
                                         "description": "Array of role IDs to assign to the user",
@@ -1855,12 +2159,20 @@
     },
     "tags": [
         {
+            "name": "Google Meet",
+            "description": "Google Meet"
+        },
+        {
             "name": "Permissions",
             "description": "Permissions"
         },
         {
             "name": "Roles",
             "description": "Roles"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
         },
         {
             "name": "Users",
