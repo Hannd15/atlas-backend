@@ -1449,15 +1449,29 @@
                                                 "roles_list": {
                                                     "type": "array",
                                                     "items": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    }
+                                                },
+                                                "roles_names": {
+                                                    "type": "array",
+                                                    "items": {
                                                         "type": "string",
-                                                        "example": "7"
+                                                        "example": "Administrador"
                                                     }
                                                 },
                                                 "permissions_list": {
                                                     "type": "array",
                                                     "items": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    }
+                                                },
+                                                "permissions_names": {
+                                                    "type": "array",
+                                                    "items": {
                                                         "type": "string",
-                                                        "example": "12"
+                                                        "example": "edit-users"
                                                     }
                                                 },
                                                 "updated_at": {

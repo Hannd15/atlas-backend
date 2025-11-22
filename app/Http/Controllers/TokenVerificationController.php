@@ -59,14 +59,28 @@ class TokenVerificationController extends Controller
      *                     property="roles_list",
      *                     type="array",
      *
-     *                     @OA\Items(type="string", example="7")
+     *                     @OA\Items(type="integer", example=7)
+     *                 ),
+     *
+     *                 @OA\Property(
+     *                     property="roles_names",
+     *                     type="array",
+     *
+     *                     @OA\Items(type="string", example="Administrador")
      *                 ),
      *
      *                 @OA\Property(
      *                     property="permissions_list",
      *                     type="array",
      *
-     *                     @OA\Items(type="string", example="12")
+     *                     @OA\Items(type="integer", example=12)
+     *                 ),
+     *
+     *                 @OA\Property(
+     *                     property="permissions_names",
+     *                     type="array",
+     *
+     *                     @OA\Items(type="string", example="edit-users")
      *                 ),
      *
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
@@ -186,8 +200,10 @@ class TokenVerificationController extends Controller
                 'id' => $tokenable->id,
                 'name' => $tokenable->name,
                 'email' => $tokenable->email,
-                'roles_list' => $tokenable->roles->pluck('id')->map(fn ($id) => (string) $id)->values(),
-                'permissions_list' => $tokenable->permissions->pluck('id')->map(fn ($id) => (string) $id)->values(),
+                'roles_list' => $tokenable->roles->pluck('id')->values(),
+                'roles_names' => $tokenable->roles->pluck('name')->values(),
+                'permissions_list' => $tokenable->permissions->pluck('id')->values(),
+                'permissions_names' => $tokenable->permissions->pluck('name')->values(),
                 'updated_at' => optional($tokenable->updated_at)->toISOString(),
             ],
             'token' => [
