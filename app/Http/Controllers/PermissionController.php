@@ -235,7 +235,7 @@ class PermissionController extends Controller
      * @OA\Post(
      *     path="/api/auth/permissions/batch",
      *     summary="Create multiple permissions",
-     *     description="Allow external modules to seed permissions in bulk",
+     *     description="Allow authenticated users or authorized integration modules to seed permissions in bulk",
      *     tags={"Permissions"},
      *     security={{"sanctum":{}}},
      *
@@ -251,6 +251,7 @@ class PermissionController extends Controller
      *                 type="array",
      *
      *                 @OA\Items(
+     *
      *                     @OA\Property(property="name", type="string", example="module.feature"),
      *                     @OA\Property(property="guard_name", type="string", example="web")
      *                 )
@@ -266,14 +267,17 @@ class PermissionController extends Controller
      *             type="array",
      *
      *             @OA\Items(
+     *
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="module.feature"),
      *                 @OA\Property(property="guard_name", type="string", example="web"),
      *                 @OA\Property(
      *                     property="roles_list",
      *                     type="array",
+     *
      *                     @OA\Items(type="integer", example=1)
      *                 ),
+     *
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
      *             )
@@ -287,6 +291,7 @@ class PermissionController extends Controller
      *         description="Internal server error",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Ocurrió un error al crear los permisos.")
      *         )
      *     )

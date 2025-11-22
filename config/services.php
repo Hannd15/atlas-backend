@@ -40,4 +40,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'pg_module' => [
+        'token' => env('MODULE_PG_TOKEN'),
+        'name' => env('MODULE_PG_NAME', 'PG'),
+        'description' => env('MODULE_PG_DESCRIPTION', 'Permisos gestionados desde el módulo PG.'),
+    ],
+
 ];
