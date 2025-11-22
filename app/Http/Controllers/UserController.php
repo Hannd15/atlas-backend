@@ -251,11 +251,7 @@ class UserController extends Controller
             if (! $user) {
                 return response()->json(['error' => 'Usuario no encontrado.'], 404);
             }
-            $rolesList = $user->roles->pluck('id')->map(fn ($id) => (int) $id);
-
-            $item = $user->toArray();
-            $item['roles_list'] = $rolesList;
-            unset($item['roles']);
+            $item = $this->formatUserForResponse($user);
 
             return response()->json($item, 200);
         } catch (\Exception $e) {
@@ -263,6 +259,117 @@ class UserController extends Controller
 
             return response()->json(['error' => 'Ocurrió un error al obtener el usuario.'], 500);
         }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/users/batch",
+     *     summary="Get multiple users by ID",
+     *     description="Retrieve multiple users with their assigned roles",
+     *     tags={"Users"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="Array of user IDs",
+     *
+     *         @OA\JsonContent(
+     *             required={"ids"},
+     *
+     *             @OA\Property(
+     *                 property="ids",
+     *                 type="array",
+     *
+     *                 @OA\Items(type="integer", example=1)
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Users retrieved successfully",
+     *
+     *         @OA\JsonContent(
+     *             type="array",
+     *
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(
+     *                     property="roles_list",
+     *                     type="array",
+     *                     @OA\Items(type="integer", example=1)
+     *                 ),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="One or more users not found",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Usuario no encontrado."),
+     *             @OA\Property(property="missing_ids", type="array", @OA\Items(type="integer", example=5))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener los usuarios.")
+     *         )
+     *     )
+     * )
+     */
+    public function batchShow(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer|min:1',
+            ]);
+
+            $ids = array_values($validated['ids']);
+            $users = User::with('roles')->whereIn('id', $ids)->get()->keyBy('id');
+            $foundIds = $users->keys()->map(fn ($value) => (int) $value)->all();
+            $missing = array_values(array_diff($ids, $foundIds));
+
+            if (! empty($missing)) {
+                return response()->json([
+                    'error' => 'Usuario no encontrado.',
+                    'missing_ids' => $missing,
+                ], 404);
+            }
+
+            $items = array_map(function (int $id) use ($users) {
+                return $this->formatUserForResponse($users->get($id));
+            }, $ids);
+
+            return response()->json($items, 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching users batch: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
+        }
+    }
+
+    private function formatUserForResponse(User $user): array
+    {
+        $rolesList = $user->roles->pluck('id')->map(fn ($id) => (int) $id);
+
+        $item = $user->toArray();
+        $item['roles_list'] = $rolesList;
+        unset($item['roles']);
+
+        return $item;
     }
 
     /**

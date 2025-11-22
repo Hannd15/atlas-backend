@@ -20,6 +20,7 @@ Route::prefix('/auth')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::post('/users', [UserController::class, 'store']);
     Route::get('/users/dropdown', [UserController::class, 'dropdown']);
+    Route::post('/users/batch', [UserController::class, 'batchShow']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);

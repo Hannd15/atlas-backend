@@ -82,7 +82,7 @@ class GoogleMeetCreationTest extends TestCase
         ]);
 
         $response->assertStatus(401);
-        $response->assertJson(['error' => 'Token inválido.']);
+        $response->assertJson(['message' => 'Unauthenticated.']);
     }
 
     public function test_create_google_meet_validates_required_fields()
