@@ -24,3 +24,6 @@ Homestead.yaml
 Thumbs.db
 /.github/*
 *.md
+**/caddy
+frankenphp
+frankenphp-worker.php
