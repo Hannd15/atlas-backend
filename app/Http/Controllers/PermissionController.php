@@ -222,16 +222,101 @@ class PermissionController extends Controller
             if (! $permission) {
                 return response()->json(['error' => 'Permiso no encontrado.'], 404);
             }
-            $permission->roles_list = $permission->roles->pluck('id')->map(fn ($id) => (int) $id);
 
-            $item = $permission->toArray();
-            unset($item['roles']);
-
-            return response()->json($item, 200);
+            return response()->json($this->formatPermissionForResponse($permission), 200);
         } catch (\Exception $e) {
             Log::error('Error fetching permission: '.$e->getMessage(), ['exception' => $e]);
 
             return response()->json(['error' => 'Ocurrió un error al obtener el permiso.'], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/permissions/batch",
+     *     summary="Create multiple permissions",
+     *     description="Allow external modules to seed permissions in bulk",
+     *     tags={"Permissions"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         description="List of permissions",
+     *
+     *         @OA\JsonContent(
+     *             required={"permissions"},
+     *
+     *             @OA\Property(
+     *                 property="permissions",
+     *                 type="array",
+     *
+     *                 @OA\Items(
+     *                     @OA\Property(property="name", type="string", example="module.feature"),
+     *                     @OA\Property(property="guard_name", type="string", example="web")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Permissions created successfully",
+     *
+     *         @OA\JsonContent(
+     *             type="array",
+     *
+     *             @OA\Items(
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="module.feature"),
+     *                 @OA\Property(property="guard_name", type="string", example="web"),
+     *                 @OA\Property(
+     *                     property="roles_list",
+     *                     type="array",
+     *                     @OA\Items(type="integer", example=1)
+     *                 ),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=400, description="Validation error"),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al crear los permisos.")
+     *         )
+     *     )
+     * )
+     */
+    public function batchStore(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'permissions' => 'required|array|min:1',
+                'permissions.*.name' => 'required|string|max:255|distinct',
+                'permissions.*.guard_name' => 'sometimes|string|max:255',
+            ]);
+
+            $items = collect($validated['permissions'])->map(function (array $permissionData) {
+                $guardName = $permissionData['guard_name'] ?? 'web';
+
+                return Permission::firstOrCreate([
+                    'name' => $permissionData['name'],
+                    'guard_name' => $guardName,
+                ]);
+            })->map(function (Permission $permission) {
+                return $this->formatPermissionForResponse($permission);
+            });
+
+            return response()->json($items->values(), 201);
+        } catch (\Exception $e) {
+            Log::error('Error creating permissions batch: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al crear los permisos.'], 500);
         }
     }
 
@@ -456,5 +541,16 @@ class PermissionController extends Controller
 
             return response()->json(['error' => 'Ocurrió un error al obtener los permisos.'], 500);
         }
+    }
+
+    private function formatPermissionForResponse(Permission $permission): array
+    {
+        $permission->loadMissing('roles');
+        $permission->roles_list = $permission->roles->pluck('id')->map(fn ($id) => (int) $id);
+
+        $item = $permission->toArray();
+        unset($item['roles']);
+
+        return $item;
     }
 }

@@ -36,6 +36,7 @@ Route::prefix('/auth')->group(function () {
     // Permission routes
     Route::get('/permissions', [PermissionController::class, 'index']);
     Route::post('/permissions', [PermissionController::class, 'store']);
+    Route::post('/permissions/batch', [PermissionController::class, 'batchStore']);
     Route::get('/permissions/dropdown', [PermissionController::class, 'dropdown']);
     Route::get('/permissions/{id}', [PermissionController::class, 'show']);
     Route::put('/permissions/{id}', [PermissionController::class, 'update']);

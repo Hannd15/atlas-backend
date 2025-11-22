@@ -13,7 +13,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            AuthorizationSeeder::class,
+            CustomAuthorizationSeeder::class,
+            // Keep the randomized seeder available for non-deterministic setups
+            // AuthorizationSeeder::class,
         ]);
     }
 }
