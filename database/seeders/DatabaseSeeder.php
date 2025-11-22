@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CustomAuthorizationSeeder::class,
             ModuleSeeder::class,
+            UserSeeder::class,
             // Keep the randomized seeder available for non-deterministic setups
             // AuthorizationSeeder::class,
         ]);

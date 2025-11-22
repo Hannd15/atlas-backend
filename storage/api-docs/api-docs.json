@@ -1910,6 +1910,12 @@
                                             "format": "date-time",
                                             "nullable": true
                                         },
+                                        "avatar": {
+                                            "type": "string",
+                                            "format": "uri",
+                                            "example": "https://example.com/avatar.png",
+                                            "nullable": true
+                                        },
                                         "roles_list": {
                                             "type": "array",
                                             "items": {
@@ -2261,6 +2267,12 @@
                                                 "type": "string",
                                                 "format": "email",
                                                 "example": "john@example.com"
+                                            },
+                                            "avatar": {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "example": "https://example.com/avatar.png",
+                                                "nullable": true
                                             },
                                             "email_verified_at": {
                                                 "type": "string",

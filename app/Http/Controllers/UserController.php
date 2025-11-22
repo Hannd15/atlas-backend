@@ -283,6 +283,7 @@ class UserController extends Controller
      *             @OA\Property(property="name", type="string", example="John Doe"),
      *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
      *             @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="avatar", type="string", format="uri", nullable=true, example="https://example.com/avatar.png"),
      *             @OA\Property(
      *                 property="roles_list",
      *                 type="array",
@@ -370,6 +371,7 @@ class UserController extends Controller
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="John Doe"),
      *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="avatar", type="string", format="uri", nullable=true, example="https://example.com/avatar.png"),
      *                 @OA\Property(property="email_verified_at", type="string", format="date-time", nullable=true),
      *                 @OA\Property(
      *                     property="roles_list",
@@ -445,6 +447,7 @@ class UserController extends Controller
 
         $item = $user->toArray();
         $item['roles_list'] = $rolesList;
+        $item['avatar'] = $user->avatar;
         unset($item['roles']);
 
         return $item;
