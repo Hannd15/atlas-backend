@@ -16,6 +16,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // User routes
         Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/by-permission/{permission}', [UserController::class, 'byPermission']);
         Route::post('/users', [UserController::class, 'store']);
         Route::get('/users/dropdown', [UserController::class, 'dropdown']);
         Route::post('/users/batch', [UserController::class, 'batchShow']);

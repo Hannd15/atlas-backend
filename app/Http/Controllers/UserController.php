@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -55,20 +56,92 @@ class UserController extends Controller
             $users = User::with('roles')
                 ->orderByDesc('updated_at')
                 ->get()
-                ->map(function ($user) {
-                    $rolesList = $user->roles->pluck('name')->implode(', ');
-
-                    $item = $user->toArray();
-                    $item['roles_list'] = $rolesList;
-                    // remove relation data to avoid exposing pivot tables
-                    unset($item['roles']);
-
-                    return $item;
-                });
+                ->map(fn (User $user) => $this->formatUserListItem($user));
 
             return response()->json($users, 200);
         } catch (\Exception $e) {
             Log::error('Error fetching users: '.$e->getMessage(), ['exception' => $e]);
+
+            return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/auth/users/by-permission/{permission}",
+     *     summary="Get users by permission",
+     *     description="Retrieve all users that have the provided permission assigned",
+     *     tags={"Users"},
+     *     security={{"sanctum":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="permission",
+     *         in="path",
+     *         required=true,
+     *         description="Permission name registered in Spatie permissions",
+     *
+     *         @OA\Schema(type="string", example="editar usuarios")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Users retrieved successfully",
+     *
+     *         @OA\JsonContent(
+     *             type="array",
+     *
+     *             @OA\Items(
+     *
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *                 @OA\Property(property="roles_list", type="string", example="Admin, Editor"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Permission not found",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Permiso no encontrado.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener los usuarios.")
+     *         )
+     *     )
+     * )
+     */
+    public function byPermission(string $permission)
+    {
+        try {
+            $permissionModel = Permission::where('name', $permission)->first();
+
+            if (! $permissionModel) {
+                return response()->json(['error' => 'Permiso no encontrado.'], 404);
+            }
+
+            $users = User::with('roles')
+                ->permission($permissionModel->name)
+                ->orderByDesc('updated_at')
+                ->get()
+                ->map(fn (User $user) => $this->formatUserListItem($user));
+
+            return response()->json($users, 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching users by permission: '.$e->getMessage(), ['exception' => $e]);
 
             return response()->json(['error' => 'Ocurrió un error al obtener los usuarios.'], 500);
         }
@@ -293,6 +366,7 @@ class UserController extends Controller
      *             type="array",
      *
      *             @OA\Items(
+     *
      *                 @OA\Property(property="id", type="integer", example=1),
      *                 @OA\Property(property="name", type="string", example="John Doe"),
      *                 @OA\Property(property="email", type="string", format="email", example="john@example.com"),
@@ -300,8 +374,10 @@ class UserController extends Controller
      *                 @OA\Property(
      *                     property="roles_list",
      *                     type="array",
+     *
      *                     @OA\Items(type="integer", example=1)
      *                 ),
+     *
      *                 @OA\Property(property="created_at", type="string", format="date-time"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time")
      *             )
@@ -313,6 +389,7 @@ class UserController extends Controller
      *         description="One or more users not found",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Usuario no encontrado."),
      *             @OA\Property(property="missing_ids", type="array", @OA\Items(type="integer", example=5))
      *         )
@@ -324,6 +401,7 @@ class UserController extends Controller
      *         description="Internal server error",
      *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="error", type="string", example="Ocurrió un error al obtener los usuarios.")
      *         )
      *     )
@@ -364,6 +442,17 @@ class UserController extends Controller
     private function formatUserForResponse(User $user): array
     {
         $rolesList = $user->roles->pluck('id')->map(fn ($id) => (int) $id);
+
+        $item = $user->toArray();
+        $item['roles_list'] = $rolesList;
+        unset($item['roles']);
+
+        return $item;
+    }
+
+    private function formatUserListItem(User $user): array
+    {
+        $rolesList = $user->roles->pluck('name')->implode(', ');
 
         $item = $user->toArray();
         $item['roles_list'] = $rolesList;

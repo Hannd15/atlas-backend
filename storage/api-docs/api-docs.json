@@ -649,7 +649,7 @@
                     "Permissions"
                 ],
                 "summary": "Create multiple permissions",
-                "description": "Allow external modules to seed permissions in bulk",
+                "description": "Allow authenticated users or authorized integration modules to seed permissions in bulk",
                 "operationId": "f1764ef0be3ef4cc430dd4f23fe9d4c6",
                 "requestBody": {
                     "description": "List of permissions",
@@ -1746,6 +1746,110 @@
                                         "error": {
                                             "type": "string",
                                             "example": "Ocurrió un error al crear el usuario."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/users/by-permission/{permission}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get users by permission",
+                "description": "Retrieve all users that have the provided permission assigned",
+                "operationId": "19a15062213f082187dd22659459105a",
+                "parameters": [
+                    {
+                        "name": "permission",
+                        "in": "path",
+                        "description": "Permission name registered in Spatie permissions",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "editar usuarios"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Users retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "John Doe"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "format": "email",
+                                                "example": "john@example.com"
+                                            },
+                                            "roles_list": {
+                                                "type": "string",
+                                                "example": "Admin, Editor"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Permission not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Permiso no encontrado."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Ocurrió un error al obtener los usuarios."
                                         }
                                     },
                                     "type": "object"
